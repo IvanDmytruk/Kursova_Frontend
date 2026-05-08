@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportHub - Головна</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/index.html">
+            <i class="fas fa-trophy me-2"></i> SportHub
+        </a>
+
+        <!-- ВИБІР СПОРТУ -->
+        <div class="dropdown me-3">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-globe me-1"></i> <span id="selectedSportName">Всі види спорту</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;" id="sportDropdownMenu">
+                <li><a class="dropdown-item" href="#" data-sport="all">🌍 Всі види спорту</a></li>
+                <li><hr class="dropdown-divider"></li>
+
+                <li><h6 class="dropdown-header bg-dark text-white">🏆 Командні види</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Football">⚽ Футбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Basketball">🏀 Баскетбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Volleyball">🏐 Волейбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Handball">🤾 Гандбол</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🎾 Індивідуальні</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Tennis">🎾 Теніс</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🥋 Єдиноборства</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Boxing">🥊 Бокс</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Judo">🥋 Дзюдо</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Karate">🥋 Карате</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">♟️ Настільні ігри</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Chess">♟️ Шахи</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Checkers">⬛ Шашки</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🎮 Кіберспорт</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Contr_Strike_2">🎯 CS2</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Dota_2">🗡️ Dota 2</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Mobile_Legends_Bang_Bang">📱 MLBB</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Hearts_of_Iron_4">🌍 Hearts of Iron IV</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Civilization_6">🏛️ Civilization VI</a></li>
+            </ul>
+        </div>
+
+        <div id="search-container" class="mx-auto" style="flex: 0.5; min-width: 250px;"></div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
+
+                <!-- ГОСТЬОВІ КНОПКИ  -->
+                <li class="nav-item" id="guestButtons" style="display: none;">
+                    <div class="d-flex gap-2">
+                        <a href="/pages/login.html" class="btn btn-outline-light btn-sm">Увійти</a>
+                        <a href="/pages/register.html" class="btn btn-primary btn-sm">Реєстрація</a>
+                    </div>
+                </li>
+
+                <!-- МЕНЮ КОРИСТУВАЧА -->
+                <li class="nav-item dropdown" id="userMenu" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="row">
+        <!-- Бічна панель -->
+        <div class="col-lg-3 mb-4">
+            <div class="profile-sidebar p-3" id="profileSidebar">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle mb-2 bg-primary d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-3x text-white"></i>
+                    </div>
+                    <h5 class="mb-1" id="userName">Гість</h5>
+                    <p class="text-muted small" id="userEmail">guest@example.com</p>
+                </div>
+                <hr>
+                <div class="system-info">
+                    <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Системна інформація</h6>
+                    <div class="small">
+                        <p class="mb-2"><i class="fas fa-calendar-alt me-2"></i>Активних турнірів: <strong id="activeTournaments">-</strong></p>
+                        <p class="mb-2"><i class="fas fa-users me-2"></i>Всього команд: <strong id="totalTeams">-</strong></p>
+                        <p class="mb-2"><i class="fas fa-clock me-2"></i>Оновлено: <span id="lastUpdate">-</span></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="quick-actions">
+                    <button class="btn btn-gradient w-100 mb-2" id="createTournamentBtn" style="display: none;">
+                        <i class="fas fa-plus-circle me-2"></i>Створити турнір
+                    </button>
+                    <button class="btn btn-outline-secondary w-100" id="notificationsBtn">
+                        <i class="fas fa-bell me-2"></i>Сповіщення
+                        <span class="badge bg-danger ms-2" id="notificationsCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Головний контент -->
+        <div class="col-lg-9">
+            <div class="welcome-section mb-4">
+                <h2>Ласкаво просимо до SportHub!</h2>
+                <p class="text-muted">Слідкуйте за найцікавішими спортивними подіями в реальному часі</p>
+            </div>
+
+            <div class="matches-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-calendar-week me-2"></i>Майбутні матчі</h5>
+                    <a href="/pages/matches.html" class="btn btn-sm btn-outline-primary">
+                        Всі матчі <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div id="upcomingMatchesList" class="row g-3"></div>
+            </div>
+
+            <div class="tournaments-section mt-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Активні турніри</h5>
+                    <a href="/pages/tournaments.html" class="btn btn-sm btn-outline-primary">
+                        Всі турніри <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div id="activeTournamentsList" class="row g-3"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Модальне вікно створення турніру -->
+<div class="modal fade" id="createTournamentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Створити турнір</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createTournamentForm">
+                    <div class="mb-3">
+                        <label class="form-label">Назва турніру</label>
+                        <input type="text" class="form-control" name="tournamentName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Опис</label>
+                        <textarea class="form-control" name="tournamentDescription" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Тип турніру</label>
+                            <select class="form-select" name="tournamentType">
+                                <option value="OlympicSystem">Олімпійська система</option>
+                                <option value="RoundRobin">Коловий турнір</option>
+                                <option value="SwissSystem">Швейцарська система</option>
+                                <option value="DoubleElimination">Дві поразки</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Формат</label>
+                            <select class="form-select" name="format">
+                                <option value="Command">Командний</option>
+                                <option value="Individual">Індивідуальний</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Призовий фонд</label>
+                            <input type="number" class="form-control" name="prizeFund" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Вид спорту</label>
+                            <select class="form-select" name="sportName" id="tournamentSportSelect">
+                                <option value="Football">⚽ Футбол</option>
+                                <option value="Basketball">🏀 Баскетбол</option>
+                                <option value="Volleyball">🏐 Волейбол</option>
+                                <option value="Handball">🤾 Гандбол</option>
+                                <option value="Tennis">🎾 Теніс</option>
+                                <option value="Boxing">🥊 Бокс</option>
+                                <option value="Judo">🥋 Дзюдо</option>
+                                <option value="Karate">🥋 Карате</option>
+                                <option value="Chess">♟️ Шахи</option>
+                                <option value="Checkers">⬛ Шашки</option>
+                                <option value="Contr_Strike_2">🎯 CS2</option>
+                                <option value="Dota_2">🗡️ Dota 2</option>
+                                <option value="Mobile_Legends_Bang_Bang">📱 MLBB</option>
+                                <option value="Hearts_of_Iron_4">🌍 Hearts of Iron IV</option>
+                                <option value="Civilization_6">🏛️ Civilization VI</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата початку</label>
+                            <input type="datetime-local" class="form-control" name="startDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата завершення</label>
+                            <input type="datetime-local" class="form-control" name="endDate">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Максимум учасників (0 = без обмежень)</label>
+                            <input type="number" class="form-control" name="maxParticipants" value="0" min="0">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                <button type="button" class="btn btn-primary" id="submitTournamentBtn">Створити</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Скрипти -->
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/authApi.js"></script>
+<script src="/logic/api/matchesApi.js"></script>
+<script src="/logic/api/teamsApi.js"></script>
+<script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/api/usersApi.js"></script>
+<script src="/logic/api/statisticsApi.js"></script>
+<script src="/logic/api/searchApi.js"></script>
+<script src="/logic/utils/dateFormatter.js"></script>
+<script src="/logic/utils/notifications.js"></script>
+<script src="/logic/utils/validators.js"></script>
+<script src="/logic/components/matchCard.js"></script>
+<script src="/logic/components/tournamentCard.js"></script>
+<script src="/logic/components/teamCard.js"></script>
+<script src="/logic/components/searchBar.js"></script>
+<script src="/logic/pages/home.js"></script>
+
+</body>
+</html>

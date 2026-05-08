@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація - SportHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style/main.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/index.html">
+            <i class="fas fa-trophy me-2"></i> SportHub
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/index.html">Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="login.html">Вхід</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-dark text-white text-center rounded-top-4 border-0 py-3">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Реєстрація</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">ПІБ</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="fullName" placeholder="Іван Дмитрук" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" placeholder="example@mail.com" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Пароль</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" placeholder="Мінімум 8 символів" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Підтвердження паролю</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Повторіть пароль" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="registerBtn">
+                            <i class="fas fa-user-plus me-2"></i>Зареєструватися
+                        </button>
+                    </form>
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Вже маєте акаунт? <a href="login.html" class="text-decoration-none">Увійти</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3 text-muted small">
+                <i class="fas fa-shield-alt me-1"></i> Ваші дані захищено
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/authApi.js"></script>
+<script src="/logic/pages/register.js"></script>
+
+</body>
+</html>

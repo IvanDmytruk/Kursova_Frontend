@@ -1,0 +1,538 @@
+/* style/components.css - Стилі компонентів */
+/* Картка матчу */
+.match-card {
+    background: white;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: var(--card-hover);
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.match-status {
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.status-live {
+    background: var(--danger);
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+
+.status-upcoming {
+    background: var(--success);
+    color: white;
+}
+
+.status-finished {
+    background: var(--secondary);
+    color: white;
+}
+
+.status-soon {
+    background: var(--warning);
+    color: #856404;
+}
+
+/* VS кружок */
+.vs-circle {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.vs-text {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Інформація про команду */
+.team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.team-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Інформація матчу */
+.match-info {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.match-date, .match-time, .match-ticket {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.match-ticket {
+    color: var(--success);
+}
+
+/* Картка турніру */
+.tournament-card {
+    background: white;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: var(--card-hover);
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.tournament-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.tournament-header {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 15px;
+    position: relative;
+}
+
+.tournament-prize {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.tournament-body {
+    padding: 15px;
+}
+
+.tournament-type {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #e9ecef;
+    display: inline-block;
+}
+
+.tournament-dates {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 10px;
+}
+
+/* Картка команди */
+.team-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 15px;
+    text-align: center;
+    transition: var(--card-hover);
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.team-card-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 2rem;
+    color: white;
+}
+
+.team-card-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.team-card-stats {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* Фільтри */
+.filter-btn {
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+}
+
+/* Стилі для модальних вікон */
+.modal-content {
+    border-radius: var(--radius-lg);
+    border: none;
+}
+
+.modal-header {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Таблиці */
+.table-custom {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.table-custom thead {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.table-custom tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 24px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+.suggestion-icon {
+    font-size: 28px;
+    margin-right: 12px;
+    width: 40px;
+    text-align: center;
+}
+
+.suggestion-info {
+    flex: 1;
+}
+
+.suggestion-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.suggestion-subtitle {
+    font-size: 12px;
+    color: #666;
+}
+
+.suggestion-score {
+    color: #ffc107;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .search-wrapper {
+        max-width: 100%;
+    }
+
+    .suggestion-item {
+        padding: 10px 12px;
+    }
+
+    .suggestion-icon {
+        font-size: 22px;
+        width: 32px;
+    }
+}
+/* Стилі для глобального пошуку */
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 24px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+.suggestion-icon {
+    font-size: 28px;
+    margin-right: 12px;
+    width: 40px;
+    text-align: center;
+}
+
+.suggestion-info {
+    flex: 1;
+}
+
+.suggestion-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.suggestion-subtitle {
+    font-size: 12px;
+    color: #666;
+}
+
+.suggestion-score {
+    color: #ffc107;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Статуси матчів */
+.status-live {
+    background: #dc3545;
+    color: white;
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    animation: pulse 1.5s infinite;
+}
+
+.status-upcoming {
+    background: #28a745;
+    color: white;
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-finished {
+    background: #6c757d;
+    color: white;
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* VS кружок */
+.vs-circle {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vs-text {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Інформація про команду */
+.team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Інформація матчу */
+.match-info {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8rem;
+    color: #6c757d;
+    justify-content: center;
+}
+
+.match-date, .match-time, .match-ticket {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.match-ticket {
+    color: #28a745;
+}
+
+/* Анімація пульсації для LIVE */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Кнопка з градієнтом */
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-gradient:hover {
+    color: white;
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .search-wrapper {
+        max-width: 100%;
+    }
+
+    .suggestion-item {
+        padding: 10px 12px;
+    }
+
+    .suggestion-icon {
+        font-size: 22px;
+        width: 32px;
+    }
+
+    .team-name {
+        font-size: 0.8rem;
+    }
+
+    .vs-circle {
+        width: 35px;
+        height: 35px;
+    }
+
+    .vs-text {
+        font-size: 11px;
+    }
+}

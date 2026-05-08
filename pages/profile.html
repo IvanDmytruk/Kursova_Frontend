@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій профіль - SportHub</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/index.html">
+            <i class="fas fa-trophy me-2"></i> SportHub
+        </a>
+        <div id="search-container" class="mx-auto" style="flex: 0.5; min-width: 250px;"></div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item active" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li id="loginMenuItem"><a class="dropdown-item" href="/pages/login.html"><i class="fas fa-sign-in-alt me-2"></i>Увійти</a></li>
+                        <li id="userMenuItem" style="display: none;"><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="row">
+        <!-- Бічна навігація профілю -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action active" data-tab="profile">
+                    <i class="fas fa-user me-2"></i> Особисті дані
+                </a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="tournaments">
+                    <i class="fas fa-trophy me-2"></i> Мої турніри
+                </a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="stats">
+                    <i class="fas fa-chart-line me-2"></i> Моя статистика
+                </a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="settings">
+                    <i class="fas fa-cog me-2"></i> Налаштування
+                </a>
+            </div>
+        </div>
+
+        <!-- Контент профілю -->
+        <div class="col-md-9">
+            <!-- Вкладка: Особисті дані -->
+            <div id="tab-profile" class="tab-content active">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Особисті дані</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-4x text-white"></i>
+                            </div>
+                            <h4 id="profileFullName">Завантаження...</h4>
+                            <p class="text-muted" id="profileRole">Роль</p>
+                        </div>
+
+                        <form id="profileForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Прізвище</label>
+                                    <input type="text" class="form-control" id="profileSurname" placeholder="Прізвище">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ім'я</label>
+                                    <input type="text" class="form-control" id="profileName" placeholder="Ім'я">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Вік</label>
+                                    <input type="number" class="form-control" id="profileAge" placeholder="Вік">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="profileEmail" placeholder="Email" readonly>
+                                <small class="text-muted">Email не можна змінити</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Роль</label>
+                                <input type="text" class="form-control" id="profileRoleDisplay" readonly>
+                                <small class="text-muted">Роль не можна змінити самостійно</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                                <i class="fas fa-save me-2"></i>Зберегти зміни
+                            </button>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-secondary" id="requestPlayerRoleBtn">
+                                    <i class="fas fa-user-graduate me-2"></i>Запит на роль "Гравець"
+                                </button>
+                                <small class="text-muted d-block mt-1">Після підтвердження адміном ви зможете брати участь у турнірах</small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: Мої турніри -->
+            <div id="tab-tournaments" class="tab-content" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Мої турніри</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="myTournamentsList" class="row">
+                            <div class="col-12 text-center text-muted py-5">
+                                <i class="fas fa-trophy fa-3x mb-3"></i>
+                                <p>У вас немає створених турнірів</p>
+                                <a href="/index.html" class="btn btn-primary btn-sm">Створити турнір</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: Моя статистика -->
+            <div id="tab-stats" class="tab-content" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Моя статистика</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h3 id="statTournamentsCount">0</h3>
+                                        <p class="text-muted mb-0">Турнірів</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h3 id="statMatchesCount">0</h3>
+                                        <p class="text-muted mb-0">Матчів</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h3 id="statWinsCount">0</h3>
+                                        <p class="text-muted mb-0">Перемог</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h3 id="statPointsCount">0</h3>
+                                        <p class="text-muted mb-0">Очок</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка: Налаштування -->
+            <div id="tab-settings" class="tab-content" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Налаштування</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="settingsForm">
+                            <div class="mb-3">
+                                <label class="form-label">Змінити пароль</label>
+                                <input type="password" class="form-control" id="newPassword" placeholder="Новий пароль">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Підтвердження паролю</label>
+                                <input type="password" class="form-control" id="confirmPassword" placeholder="Підтвердіть пароль">
+                            </div>
+                            <button type="button" class="btn btn-warning" id="changePasswordBtn">
+                                <i class="fas fa-key me-2"></i>Змінити пароль
+                            </button>
+                            <hr>
+                            <button type="button" class="btn btn-danger" id="deleteAccountBtn">
+                                <i class="fas fa-trash me-2"></i>Видалити акаунт
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/authApi.js"></script>
+<script src="/logic/api/usersApi.js"></script>
+<script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/utils/dateFormatter.js"></script>
+<script src="/logic/utils/notifications.js"></script>
+<script src="/logic/pages/profile.js"></script>
+<script src="/logic/api/statisticsApi.js"></script>
+
+</body>
+</html>

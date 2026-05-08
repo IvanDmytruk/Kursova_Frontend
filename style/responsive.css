@@ -1,0 +1,140 @@
+/* style/responsive.css - Адаптивність */
+
+/* Планшети */
+@media (max-width: 992px) {
+    .container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .profile-sidebar {
+        position: static;
+        margin-bottom: 20px;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Мобільні пристрої */
+@media (max-width: 768px) {
+    .profile-sidebar {
+        margin-bottom: 20px;
+    }
+
+    .match-info {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-end;
+    }
+
+    .vs-circle {
+        width: 35px;
+        height: 35px;
+    }
+
+    .vs-text {
+        font-size: 10px;
+    }
+
+    .team-name {
+        font-size: 0.85rem;
+    }
+
+    .team-logo {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+    }
+
+    .match-card .card-body {
+        padding: 0.9rem;
+    }
+
+    .tournament-header h6 {
+        font-size: 0.9rem;
+    }
+
+    .tournament-prize {
+        font-size: 0.7rem;
+        top: 5px;
+        right: 10px;
+    }
+
+    .welcome-section {
+        padding: 20px;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .btn-group {
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        flex: 1;
+    }
+
+    /* Модальні вікна на мобільних */
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .modal-content {
+        border-radius: var(--radius-md);
+    }
+}
+
+/* Дуже маленькі телефони */
+@media (max-width: 576px) {
+    .team-name {
+        font-size: 0.75rem;
+    }
+
+    .vs-circle {
+        width: 28px;
+        height: 28px;
+    }
+
+    .vs-text {
+        font-size: 8px;
+    }
+
+    .match-status {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+    }
+
+    .tournament-card .card-body {
+        padding: 10px;
+    }
+
+    .team-card-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Темна тема (опціонально) */
+@media (prefers-color-scheme: dark) {
+    body.dark-theme {
+        background: #1a1a2e;
+    }
+
+    body.dark-theme .match-card,
+    body.dark-theme .tournament-card,
+    body.dark-theme .team-card,
+    body.dark-theme .profile-sidebar {
+        background: #16213e;
+        color: #eee;
+        border-color: #0f3460;
+    }
+
+    body.dark-theme .text-muted {
+        color: #a0a0a0 !important;
+    }
+}

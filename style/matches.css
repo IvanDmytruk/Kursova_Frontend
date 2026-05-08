@@ -1,0 +1,236 @@
+/* style/matches.css - стилі для сторінок матчів */
+
+/* Стилі для сторінки деталей матчу */
+.player-card {
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.player-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.starter {
+    border-left: 4px solid #28a745;
+}
+
+.bench {
+    border-left: 4px solid #ffc107;
+}
+
+.score-card {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.stat-bar {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    background: #0d6efd;
+    transition: width 0.3s;
+}
+
+.team-formation {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+    border-bottom: 3px solid #0d6efd;
+}
+
+.event-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.event-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.event-item {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.event-time {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.admin-actions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.formation-text {
+    font-family: monospace;
+    font-size: 1.1rem;
+}
+
+/* Стилі для вибору гравців в модальному вікні */
+.player-selection {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.player-selection .form-check {
+    padding: 8px 12px;
+    margin: 0;
+    border-bottom: 1px solid #e9ecef;
+    transition: background 0.2s;
+}
+
+.player-selection .form-check:hover {
+    background: #f8f9fa;
+}
+
+.player-selection .form-check-input {
+    margin-right: 10px;
+}
+
+.player-selection .form-check-input:checked + .form-check-label {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+/* Стилі для кнопок адміністратора */
+.admin-actions .btn {
+    display: block;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+}
+
+.admin-actions .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Адаптивність для мобільних */
+@media (max-width: 768px) {
+    .score-card {
+        font-size: 2rem;
+    }
+
+    .admin-actions .btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .player-card {
+        font-size: 0.9rem;
+    }
+
+    .event-time {
+        left: -25px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Стилі для статусів матчів */
+.match-status-upcoming {
+    background-color: #6c757d;
+}
+
+.match-status-live {
+    background-color: #dc3545;
+    animation: pulse 1.5s infinite;
+}
+
+.match-status-finished {
+    background-color: #28a745;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Стилі для списку матчів на сторінці matches.html */
+.match-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.match-score {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.match-teams {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.match-team {
+    flex: 1;
+    padding: 10px;
+}
+
+.match-team-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.match-team-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.filter-btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* Стилі для табло */
+.live-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #dc3545;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+    margin-right: 5px;
+}
