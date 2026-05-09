@@ -1,6 +1,6 @@
 // logic/api/config.js
 const API_CONFIG = {
-    baseUrl: 'https://localhost:7171',
+    baseUrl: 'https://kursova-beckend.onrender.com',
     timeout: 30000,
     defaultHeaders: {
         'Content-Type': 'application/json',
