@@ -37,6 +37,10 @@ $(document).ready(function() {
     loadUpcomingMatches();
     loadActiveTournaments();
     bindHomeEvents();
+    if (window.SearchBar && $('#search-container').length) {
+        new SearchBar('search-container');
+        console.log('SearchBar initialized');
+    }
 });
 
 // Функція оновлення UI (гостьові кнопки / меню користувача / бічна панель)
@@ -186,21 +190,6 @@ async function loadSystemInfo() {
     }
     $('#totalTeams').text('0');
 }
-
-async function bindHomeEvents() {
-    $('#createTournamentBtn').click(() => {
-        $('#createTournamentModal').modal('show');
-    });
-
-    $('#submitTournamentBtn').click(async () => {
-        await createTournament();
-    });
-
-    $('#notificationsBtn').click(async () => {
-        await checkNotifications();
-    });
-}
-
 async function loadUpcomingMatches() {
     console.log('loadUpcomingMatches called, currentSport:', currentSport);
 
@@ -379,7 +368,7 @@ async function createTournament() {
     let selectedSport = currentSport;
 
     if (selectedSport === 'all') {
-        const sport = prompt('Введіть вид спорту для турніру (Football, Basketball, Chess, etc.):');
+        const sport = prompt('Введіть вид спорту для турніру (Football, Basketball, Boxing, Chess, etc.):');
         if (!sport) {
             alert('Виберіть вид спорту');
             return;
@@ -387,19 +376,42 @@ async function createTournament() {
         selectedSport = sport;
     }
 
+    // Маппінг українських назв на англійські
+    const sportMapping = {
+        'Футбол': 'Football', 'Баскетбол': 'Basketball', 'Волейбол': 'Volleyball',
+        'Гандбол': 'Handball', 'Теніс': 'Tennis', 'Бокс': 'Boxing',
+        'Дзюдо': 'Judo', 'Карате': 'Karate', 'Шахи': 'Chess', 'Шашки': 'Checkers'
+    };
+    if (sportMapping[selectedSport]) selectedSport = sportMapping[selectedSport];
+
+    // Конвертація дати в ISO формат
+    const startDateRaw = form.find('[name="startDate"]').val();
+    const endDateRaw = form.find('[name="endDate"]').val();
+
+    if (!startDateRaw) {
+        alert('Введіть дату початку турніру');
+        return;
+    }
+
+    const startDate = new Date(startDateRaw).toISOString();
+    const endDate = endDateRaw ? new Date(endDateRaw).toISOString() : null;
+
+    // Отримуємо ID користувача з localStorage
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
     const formData = {
         tournamentName: form.find('[name="tournamentName"]').val(),
         tournamentDescription: form.find('[name="tournamentDescription"]').val(),
         tournamentType: form.find('[name="tournamentType"]').val(),
         format: form.find('[name="format"]').val(),
         prizeFund: parseInt(form.find('[name="prizeFund"]').val()) || 0,
-        startDate: form.find('[name="startDate"]').val(),
-        endDate: form.find('[name="endDate"]').val() || null,
+        startDate: startDate,
+        endDate: endDate,
         sportName: selectedSport,
-        maxParticipants: parseInt(form.find('[name="maxParticipants"]').val()) || 0
+        maxParticipants: parseInt(form.find('[name="maxParticipants"]').val()) || 0,
+        createdBy: user.id || null
     };
 
-    console.log('Creating tournament with sport:', selectedSport);
     console.log('Form data:', formData);
 
     if (!formData.tournamentName) {
@@ -409,9 +421,7 @@ async function createTournament() {
 
     try {
         $('#submitTournamentBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Створення...');
-
         await window.tournamentsApi.create(formData);
-
         alert('Турнір успішно створено!');
         $('#createTournamentModal').modal('hide');
         form[0].reset();
@@ -475,7 +485,46 @@ function formatMatchTime(dateStr) {
     const date = new Date(dateStr);
     return date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
+function bindHomeEvents() {
+    $('#createTournamentBtn').click(() => {
+        $('#createTournamentModal').modal('show');
+    });
 
+    $('#submitTournamentBtn').click(async () => {
+        await createTournament();
+    });
+
+    $('#notificationsBtn').click(async () => {
+        await checkNotifications();
+    });
+
+    $('#searchAllMatchesBtn').click(() => {
+        openGlobalSearch('match');
+    });
+
+    $('#searchAllTournamentsBtn').click(() => {
+        openGlobalSearch('tournament');
+    });
+}
+
+// Функція відкриття глобального пошуку
+function openGlobalSearch(type) {
+    // Активуємо пошукову панель
+    const searchInput = $('#global-search');
+    if (searchInput.length) {
+        searchInput.focus();
+        searchInput.trigger('input');
+        // Додаємо підказку
+        if (type === 'match') {
+            searchInput.attr('placeholder', 'Пошук матчів...');
+        } else if (type === 'tournament') {
+            searchInput.attr('placeholder', 'Пошук турнірів...');
+        }
+    } else {
+        // Якщо пошукової панелі немає – показати модальне вікно
+        showNotification('Використовуйте пошук у верхній панелі', 'info');
+    }
+}
 // Глобальна функція для тестування
 window.selectSport = function(sport) {
     console.log('TEST: Setting sport to', sport);

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль гравця - SportHub</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/index.html">
+            <i class="fas fa-trophy me-2"></i> SportHub
+        </a>
+        <div id="search-container" class="mx-auto" style="flex: 0.5; min-width: 250px;"></div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
+
+                <li class="nav-item" id="guestButtons" style="display: none;">
+                    <div class="d-flex gap-2">
+                        <a href="/pages/login.html" class="btn btn-outline-light btn-sm">Увійти</a>
+                        <a href="/pages/register.html" class="btn btn-primary btn-sm">Реєстрація</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown" id="userMenu" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div id="loadingSpinner" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Завантаження...</span>
+        </div>
+    </div>
+
+    <div id="playerContent" style="display: none;">
+        <!-- Профіль гравця -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <div class="avatar-placeholder rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-6x text-white"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h2 id="playerFullName">Завантаження...</h2>
+                                <p id="playerRole" class="text-muted"></p>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-warning" id="savePlayerBtn" style="display: none;">
+                                    <i class="far fa-bookmark"></i> Зберегти гравця
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <strong>Вік:</strong> <span id="playerAge">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Email:</strong> <span id="playerEmail">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Телефон:</strong> <span id="playerPhone">-</span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <strong>Команда:</strong> <span id="playerTeam">Не вказано</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Ігровий номер:</strong> <span id="playerJerseyNumber">-</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Популярність:</strong> <span id="playerPopularity">0</span> ⭐
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладки -->
+        <ul class="nav nav-tabs mb-3" id="playerTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#statsTab">
+                    <i class="fas fa-chart-line me-1"></i> Статистика
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tournamentsTab">
+                    <i class="fas fa-trophy me-1"></i> Турніри
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#matchesTab">
+                    <i class="fas fa-futbol me-1"></i> Матчі
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Статистика -->
+            <div class="tab-pane fade show active" id="statsTab">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Статистика гравця</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="statsMessage" class="text-center text-muted py-4" style="display: none;">
+                            <i class="fas fa-chart-simple fa-2x mb-2"></i>
+                            <p>Статистика відсутня</p>
+                        </div>
+                        <div id="statsContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Турніри -->
+            <div class="tab-pane fade" id="tournamentsTab">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Участь у турнірах</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="tournamentsList" class="row">
+                            <div class="col-12 text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                <p>Завантаження...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Матчі -->
+            <div class="tab-pane fade" id="matchesTab">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Матчі гравця</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="matchesList" class="list-group">
+                            <div class="col-12 text-center text-muted py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                <p>Завантаження...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/usersApi.js"></script>
+<script src="/logic/api/teamsApi.js"></script>
+<script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/api/matchesApi.js"></script>
+<script src="/logic/api/statisticsApi.js"></script>
+<script src="/logic/api/savedItemsApi.js"></script>
+<script src="/logic/utils/dateFormatter.js"></script>
+<script src="/logic/utils/notifications.js"></script>
+<script src="/logic/components/searchBar.js"></script>
+<script src="/logic/pages/playerDetails.js"></script>
+
+</body>
+</html>

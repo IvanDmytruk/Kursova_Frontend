@@ -47,6 +47,10 @@ class TournamentsApi extends BaseApi {
     async getActiveBySport(sport) {
         return this.get(`${this.baseUrl}${this.endpoint}/active?sport=${sport}`);
     }
+    async create(tournamentData) {
+        console.log('Sending to server:', JSON.stringify(tournamentData, null, 2));
+        return this.post(`${this.baseUrl}${this.endpoint}`, tournamentData);
+    }
 }
 
 window.tournamentsApi = new TournamentsApi();

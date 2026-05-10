@@ -536,3 +536,39 @@
         font-size: 11px;
     }
 }
+/* Додайте в кінець файлу components.css */
+
+/* Scroll для вибору спорту - працює на всіх пристроях */
+#sportDropdownMenu {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Стилізація скролу для вибору спорту */
+#sportDropdownMenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 10px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-thumb:hover {
+    background: #5a67d8;
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    #sportDropdownMenu {
+        max-height: 300px;
+        min-width: 260px !important;
+    }
+}

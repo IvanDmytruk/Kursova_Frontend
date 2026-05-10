@@ -22,7 +22,6 @@
             <i class="fas fa-trophy me-2"></i> SportHub
         </a>
 
-        <!-- ВИБІР СПОРТУ -->
         <div class="dropdown me-3">
             <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 <i class="fas fa-globe me-1"></i> <span id="selectedSportName">Всі види спорту</span>
@@ -30,28 +29,23 @@
             <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;" id="sportDropdownMenu">
                 <li><a class="dropdown-item" href="#" data-sport="all">🌍 Всі види спорту</a></li>
                 <li><hr class="dropdown-divider"></li>
-
                 <li><h6 class="dropdown-header bg-dark text-white">🏆 Командні види</h6></li>
                 <li><a class="dropdown-item" href="#" data-sport="Football">⚽ Футбол</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Basketball">🏀 Баскетбол</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Volleyball">🏐 Волейбол</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Handball">🤾 Гандбол</a></li>
-
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header bg-dark text-white">🎾 Індивідуальні</h6></li>
                 <li><a class="dropdown-item" href="#" data-sport="Tennis">🎾 Теніс</a></li>
-
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header bg-dark text-white">🥋 Єдиноборства</h6></li>
                 <li><a class="dropdown-item" href="#" data-sport="Boxing">🥊 Бокс</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Judo">🥋 Дзюдо</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Karate">🥋 Карате</a></li>
-
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header bg-dark text-white">♟️ Настільні ігри</h6></li>
                 <li><a class="dropdown-item" href="#" data-sport="Chess">♟️ Шахи</a></li>
                 <li><a class="dropdown-item" href="#" data-sport="Checkers">⬛ Шашки</a></li>
-
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header bg-dark text-white">🎮 Кіберспорт</h6></li>
                 <li><a class="dropdown-item" href="#" data-sport="Contr_Strike_2">🎯 CS2</a></li>
@@ -70,12 +64,11 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
                 <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
                 <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
                 <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
 
-                <!-- ГОСТЬОВІ КНОПКИ  -->
                 <li class="nav-item" id="guestButtons" style="display: none;">
                     <div class="d-flex gap-2">
                         <a href="/pages/login.html" class="btn btn-outline-light btn-sm">Увійти</a>
@@ -83,7 +76,6 @@
                     </div>
                 </li>
 
-                <!-- МЕНЮ КОРИСТУВАЧА -->
                 <li class="nav-item dropdown" id="userMenu" style="display: none;">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
@@ -102,7 +94,6 @@
 
 <main class="container my-4">
     <div class="row">
-        <!-- Бічна панель -->
         <div class="col-lg-3 mb-4">
             <div class="profile-sidebar p-3" id="profileSidebar">
                 <div class="text-center mb-3">
@@ -134,7 +125,6 @@
             </div>
         </div>
 
-        <!-- Головний контент -->
         <div class="col-lg-9">
             <div class="welcome-section mb-4">
                 <h2>Ласкаво просимо до SportHub!</h2>
@@ -144,9 +134,9 @@
             <div class="matches-section">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0"><i class="fas fa-calendar-week me-2"></i>Майбутні матчі</h5>
-                    <a href="/pages/matches.html" class="btn btn-sm btn-outline-primary">
+                    <button class="btn btn-sm btn-outline-primary" id="viewAllMatchesBtn">
                         Всі матчі <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    </button>
                 </div>
                 <div id="upcomingMatchesList" class="row g-3"></div>
             </div>
@@ -154,9 +144,9 @@
             <div class="tournaments-section mt-5">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Активні турніри</h5>
-                    <a href="/pages/tournaments.html" class="btn btn-sm btn-outline-primary">
+                    <button class="btn btn-sm btn-outline-primary" id="viewAllTournamentsBtn">
                         Всі турніри <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                    </button>
                 </div>
                 <div id="activeTournamentsList" class="row g-3"></div>
             </div>
@@ -164,7 +154,6 @@
     </div>
 </main>
 
-<!-- Модальне вікно створення турніру -->
 <div class="modal fade" id="createTournamentModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -252,7 +241,6 @@
     </div>
 </div>
 
-<!-- Скрипти -->
 <script src="/logic/api/config.js"></script>
 <script src="/logic/api/authApi.js"></script>
 <script src="/logic/api/matchesApi.js"></script>

@@ -1,41 +1,84 @@
-<!-- teams.html-->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Команди - SportHub</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../style/main.css">
-    <link rel="stylesheet" href="../style/components.css">
-    <link rel="stylesheet" href="../style/responsive.css">
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/responsive.css">
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="../index.html">
+        <a class="navbar-brand fw-bold fs-3" href="/index.html">
             <i class="fas fa-trophy me-2"></i> SportHub
         </a>
+        <div class="dropdown me-3">
+            <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-globe me-1"></i> <span id="selectedSportName">Всі види спорту</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;" id="sportDropdownMenu">
+                <li><a class="dropdown-item" href="#" data-sport="all">🌍 Всі види спорту</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🏆 Командні види</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Football">⚽ Футбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Basketball">🏀 Баскетбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Volleyball">🏐 Волейбол</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Handball">🤾 Гандбол</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🎾 Індивідуальні</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Tennis">🎾 Теніс</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🥋 Єдиноборства</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Boxing">🥊 Бокс</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Judo">🥋 Дзюдо</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Karate">🥋 Карате</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">♟️ Настільні ігри</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Chess">♟️ Шахи</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Checkers">⬛ Шашки</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header bg-dark text-white">🎮 Кіберспорт</h6></li>
+                <li><a class="dropdown-item" href="#" data-sport="Contr_Strike_2">🎯 CS2</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Dota_2">🗡️ Dota 2</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Mobile_Legends_Bang_Bang">📱 MLBB</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Hearts_of_Iron_4">🌍 Hearts of Iron IV</a></li>
+                <li><a class="dropdown-item" href="#" data-sport="Civilization_6">🏛️ Civilization VI</a></li>
+            </ul>
+        </div>
+        <div id="search-container" class="mx-auto" style="flex: 0.5; min-width: 250px;"></div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="../index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
-                <li class="nav-item"><a class="nav-link active" href="saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
-                <li class="nav-item"><a class="nav-link" href="tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
-                <li class="nav-item"><a class="nav-link" href="teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
-                <li class="nav-item dropdown">
+                <li class="nav-item"><a class="nav-link" href="/index.html"><i class="fas fa-home me-1"></i>Головна</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
+                <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
+
+                <li class="nav-item" id="guestButtons" style="display: none;">
+                    <div class="d-flex gap-2">
+                        <a href="/pages/login.html" class="btn btn-outline-light btn-sm">Увійти</a>
+                        <a href="/pages/register.html" class="btn btn-primary btn-sm">Реєстрація</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown" id="userMenu" style="display: none;">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i> Профіль
+                        <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
-                        <li><a class="dropdown-item" href="profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="fas fa-sign-out-alt me-2"></i>Вихід</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
                     </ul>
                 </li>
             </ul>
@@ -44,21 +87,79 @@
 </nav>
 
 <main class="container my-4">
-    <div class="row">
-        <div class="col-12">
-            <h2>Сторінка в розробці</h2>
-            <p>Тут буде контент</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-users me-2"></i>Команди</h2>
+        <button class="btn btn-primary" id="createTeamBtn" style="display: none;">
+            <i class="fas fa-plus me-2"></i>Створити команду
+        </button>
+    </div>
+
+    <div id="teamsList" class="row g-4">
+        <div class="col-12 text-center text-muted py-5">
+            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+            <p>Завантаження команд...</p>
         </div>
     </div>
 </main>
 
+<!-- Модальне вікно створення команди -->
+<div class="modal fade" id="createTeamModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Створити команду</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createTeamForm">
+                    <div class="mb-3">
+                        <label class="form-label">Назва команди</label>
+                        <input type="text" class="form-control" name="teamName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Опис</label>
+                        <textarea class="form-control" name="teamDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Вид спорту</label>
+                        <select class="form-select" name="sportName" id="teamSportSelect">
+                            <option value="Football">⚽ Футбол</option>
+                            <option value="Basketball">🏀 Баскетбол</option>
+                            <option value="Volleyball">🏐 Волейбол</option>
+                            <option value="Handball">🤾 Гандбол</option>
+                            <option value="Tennis">🎾 Теніс</option>
+                            <option value="Boxing">🥊 Бокс</option>
+                            <option value="Judo">🥋 Дзюдо</option>
+                            <option value="Karate">🥋 Карате</option>
+                            <option value="Chess">♟️ Шахи</option>
+                            <option value="Checkers">⬛ Шашки</option>
+                            <option value="Contr_Strike_2">🎯 CS2</option>
+                            <option value="Dota_2">🗡️ Dota 2</option>
+                            <option value="Mobile_Legends_Bang_Bang">📱 MLBB</option>
+                            <option value="Hearts_of_Iron_4">🌍 Hearts of Iron IV</option>
+                            <option value="Civilization_6">🏛️ Civilization VI</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                <button type="button" class="btn btn-primary" id="submitTeamBtn">Створити</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.getElementById('logoutLink')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('currentUser');
-        window.location.href = '../index.html';
-    });
-</script>
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/authApi.js"></script>
+<script src="/logic/api/teamsApi.js"></script>
+<script src="/logic/api/savedItemsApi.js"></script>
+<script src="/logic/utils/dateFormatter.js"></script>
+<script src="/logic/utils/notifications.js"></script>
+<script src="/logic/components/searchBar.js"></script>
+<script src="/logic/pages/teams.js"></script>
+
 </body>
 </html>

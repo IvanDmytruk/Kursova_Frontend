@@ -138,3 +138,388 @@
         color: #a0a0a0 !important;
     }
 }
+/* style/responsive.css - Адаптивність */
+
+/* Базові налаштування для всіх пристроїв */
+* {
+    box-sizing: border-box;
+}
+
+/* SCROLL ДЛЯ ВИБОРУ СПОРТУ (працює і на ПК, і на телефоні) */
+#sportDropdownMenu {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Для дуже високих екранів можна більше */
+@media (min-height: 800px) {
+    #sportDropdownMenu {
+        max-height: 500px;
+    }
+}
+
+/* Планшети (768px - 1024px) */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 95%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .col-lg-3, .col-lg-9 {
+        width: 100%;
+    }
+
+    .profile-sidebar {
+        margin-bottom: 25px;
+        position: static;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.6rem;
+    }
+
+    /* Адаптація карток турнірів */
+    .tournament-card .col-md-6 {
+        width: 50%;
+    }
+
+    /* Scroll для вибору спорту на планшеті */
+    #sportDropdownMenu {
+        max-height: 350px;
+    }
+}
+
+/* Мобільні пристрої (до 768px) */
+@media (max-width: 768px) {
+    /* Навігація */
+    .navbar .container {
+        flex-wrap: wrap;
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem !important;
+    }
+
+    /* Пошук на всю ширину */
+    #search-container {
+        order: 3;
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        flex: none !important;
+        min-width: 100% !important;
+    }
+
+    /* Кнопка вибору спорту */
+    .dropdown-me-3 {
+        margin-right: auto;
+    }
+
+    /* SCROLL ДЛЯ ВИБОРУ СПОРТУ НА ТЕЛЕФОНІ */
+    #sportDropdownMenu {
+        max-height: 300px;
+        width: 280px !important;
+        right: 0;
+        left: auto !important;
+    }
+
+    /* Заголовки */
+    h2, h4, h5 {
+        font-size: 1.2rem;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .welcome-section p {
+        font-size: 0.85rem;
+    }
+
+    /* Бічна панель */
+    .profile-sidebar {
+        text-align: center;
+    }
+
+    /* Картки матчів */
+    .match-card .team-name {
+        font-size: 0.8rem;
+    }
+
+    .vs-circle {
+        width: 35px;
+        height: 35px;
+    }
+
+    .vs-text {
+        font-size: 10px;
+    }
+
+    .score-card {
+        font-size: 1.5rem;
+    }
+
+    /* Картки турнірів */
+    .tournament-card .col-md-6 {
+        width: 100%;
+    }
+
+    .tournament-header h6 {
+        font-size: 0.9rem;
+        padding-right: 60px;
+    }
+
+    .tournament-prize {
+        font-size: 0.7rem;
+        top: 8px;
+        right: 10px;
+    }
+
+    /* Картки команд */
+    .team-card-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    /* Кнопки */
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .btn-gradient, .btn-outline-secondary {
+        font-size: 0.85rem;
+    }
+
+    /* Сповіщення */
+    #notificationsCount {
+        font-size: 0.7rem;
+    }
+
+    /* Таби (якщо є) */
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tabs .nav-item {
+        display: inline-block;
+        float: none;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Модальні вікна */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-footer {
+        padding: 10px 15px;
+    }
+
+    /* Форми */
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    .form-control, .form-select {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+}
+
+/* Дуже маленькі телефони (до 480px) */
+@media (max-width: 480px) {
+    /* Навігація */
+    .navbar-brand {
+        font-size: 1.1rem !important;
+    }
+
+    .btn-outline-light, .btn-primary {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    /* Вибір спорту */
+    #sportDropdownMenu {
+        max-height: 250px;
+        width: 260px !important;
+    }
+
+    .dropdown-header {
+        font-size: 0.7rem;
+    }
+
+    .dropdown-item {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    /* Картки */
+    .match-card .card-body,
+    .tournament-card .card-body,
+    .team-card .card-body {
+        padding: 10px;
+    }
+
+    .match-status {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+    }
+
+    .match-info {
+        font-size: 0.65rem;
+        gap: 8px;
+    }
+
+    .team-name {
+        font-size: 0.7rem;
+    }
+
+    .team-logo {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+    }
+
+    .vs-circle {
+        width: 28px;
+        height: 28px;
+    }
+
+    .vs-text {
+        font-size: 8px;
+    }
+
+    /* Бічна панель */
+    .profile-sidebar {
+        padding: 15px !important;
+    }
+
+    .profile-sidebar h5 {
+        font-size: 1rem;
+    }
+
+    .system-info {
+        font-size: 0.75rem;
+    }
+
+    /* Турніри */
+    .tournament-header {
+        padding: 10px;
+    }
+
+    .tournament-body {
+        padding: 10px;
+    }
+
+    .tournament-type {
+        font-size: 0.6rem;
+    }
+
+    .tournament-dates {
+        font-size: 0.65rem;
+    }
+
+    /* Статистика */
+    .stat-card .card-body {
+        padding: 10px;
+    }
+
+    .stat-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .stat-card p {
+        font-size: 0.7rem;
+    }
+}
+
+/* SCROLLBAR стилізація для вибору спорту */
+#sportDropdownMenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+#sportDropdownMenu::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Адаптація для планшетів в альбомній орієнтації */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .profile-sidebar {
+        position: sticky;
+        top: 80px;
+    }
+
+    #sportDropdownMenu {
+        max-height: 400px;
+    }
+}
+
+/* Для пристроїв з високою роздільною здатністю */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+
+    #sportDropdownMenu {
+        max-height: 500px;
+    }
+}
+
+/* Темна тема (опціонально) */
+@media (prefers-color-scheme: dark) {
+    body.dark-theme {
+        background: #1a1a2e;
+    }
+
+    body.dark-theme .match-card,
+    body.dark-theme .tournament-card,
+    body.dark-theme .team-card,
+    body.dark-theme .profile-sidebar {
+        background: #16213e;
+        color: #eee;
+        border-color: #0f3460;
+    }
+
+    body.dark-theme .text-muted {
+        color: #a0a0a0 !important;
+    }
+
+    body.dark-theme #sportDropdownMenu {
+        background: #16213e;
+        border-color: #0f3460;
+    }
+
+    body.dark-theme .dropdown-item {
+        color: #eee;
+    }
+
+    body.dark-theme .dropdown-item:hover {
+        background: #0f3460;
+    }
+}

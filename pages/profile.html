@@ -29,16 +29,23 @@
                 <li class="nav-item"><a class="nav-link" href="/pages/saved.html"><i class="fas fa-bookmark me-1"></i>Обране</a></li>
                 <li class="nav-item"><a class="nav-link" href="/pages/tournaments.html"><i class="fas fa-trophy me-1"></i>Турніри</a></li>
                 <li class="nav-item"><a class="nav-link" href="/pages/teams.html"><i class="fas fa-users me-1"></i>Команди</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+
+                <li class="nav-item" id="guestButtons" style="display: none;">
+                    <div class="d-flex gap-2">
+                        <a href="/pages/login.html" class="btn btn-outline-light btn-sm">Увійти</a>
+                        <a href="/pages/register.html" class="btn btn-primary btn-sm">Реєстрація</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown" id="userMenu" style="display: none;">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle me-1"></i> <span id="userNameNav">Профіль</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item active" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
+                        <li><a class="dropdown-item" href="/pages/profile.html"><i class="fas fa-id-card me-2"></i>Мій профіль</a></li>
                         <li><a class="dropdown-item" href="/pages/profile.html?tab=stats"><i class="fas fa-chart-line me-2"></i>Моя статистика</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li id="loginMenuItem"><a class="dropdown-item" href="/pages/login.html"><i class="fas fa-sign-in-alt me-2"></i>Увійти</a></li>
-                        <li id="userMenuItem" style="display: none;"><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Вийти</a></li>
                     </ul>
                 </li>
             </ul>
