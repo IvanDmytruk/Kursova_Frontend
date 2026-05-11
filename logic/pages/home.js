@@ -43,7 +43,39 @@ $(document).ready(function() {
     }
 });
 
-// Функція оновлення UI (гостьові кнопки / меню користувача / бічна панель)
+// НОВА ФУНКЦІЯ: Перевірка прав адміністратора та показ кнопки
+function checkAndShowAdminButton() {
+    const token = localStorage.getItem('accessToken');
+    const adminBtn = document.getElementById('adminPanelBtn');
+
+    if (!adminBtn) {
+        console.log('Admin button element not found in DOM');
+        return;
+    }
+
+    if (!token) {
+        adminBtn.style.display = 'none';
+        return;
+    }
+
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Decoded token payload:', payload);
+
+        if (payload.role === 'Admin' || payload.role === 'admin') {
+            adminBtn.style.display = 'block';
+            console.log('Admin button shown - user has Admin role');
+        } else {
+            adminBtn.style.display = 'none';
+            console.log('Admin button hidden - user role:', payload.role);
+        }
+    } catch (e) {
+        console.error('Error decoding token:', e);
+        adminBtn.style.display = 'none';
+    }
+}
+
+// ОНОВЛЕНА ФУНКЦІЯ: Оновлення UI (гостьові кнопки / меню користувача / бічна панель)
 function updateAuthUI() {
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -67,6 +99,10 @@ function updateAuthUI() {
         // Кнопки
         $('#createTournamentBtn').show();
         $('.system-info').show();
+
+        // ПЕРЕВІРКА НА АДМІНА - показуємо кнопку адмін-панелі
+        checkAndShowAdminButton();
+
     } else {
         // НЕАВТОРИЗОВАНИЙ
         console.log('❌ User is NOT logged in');
@@ -82,6 +118,10 @@ function updateAuthUI() {
         // Кнопки
         $('#createTournamentBtn').hide();
         $('.system-info').hide();
+
+        // ХОВАЄМО КНОПКУ АДМІН-ПАНЕЛІ
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) adminBtn.style.display = 'none';
     }
 }
 
@@ -190,6 +230,7 @@ async function loadSystemInfo() {
     }
     $('#totalTeams').text('0');
 }
+
 async function loadUpcomingMatches() {
     console.log('loadUpcomingMatches called, currentSport:', currentSport);
 
@@ -485,6 +526,7 @@ function formatMatchTime(dateStr) {
     const date = new Date(dateStr);
     return date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
+
 function bindHomeEvents() {
     $('#createTournamentBtn').click(() => {
         $('#createTournamentModal').modal('show');
@@ -509,22 +551,20 @@ function bindHomeEvents() {
 
 // Функція відкриття глобального пошуку
 function openGlobalSearch(type) {
-    // Активуємо пошукову панель
     const searchInput = $('#global-search');
     if (searchInput.length) {
         searchInput.focus();
         searchInput.trigger('input');
-        // Додаємо підказку
         if (type === 'match') {
             searchInput.attr('placeholder', 'Пошук матчів...');
         } else if (type === 'tournament') {
             searchInput.attr('placeholder', 'Пошук турнірів...');
         }
     } else {
-        // Якщо пошукової панелі немає – показати модальне вікно
         showNotification('Використовуйте пошук у верхній панелі', 'info');
     }
 }
+
 // Глобальна функція для тестування
 window.selectSport = function(sport) {
     console.log('TEST: Setting sport to', sport);
@@ -538,3 +578,4 @@ window.selectSport = function(sport) {
 // Експорт функцій
 window.loadUpcomingMatches = loadUpcomingMatches;
 window.loadActiveTournaments = loadActiveTournaments;
+window.checkAndShowAdminButton = checkAndShowAdminButton;
