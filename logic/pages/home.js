@@ -43,9 +43,8 @@ $(document).ready(function() {
     }
 });
 
-// НОВА ФУНКЦІЯ: Перевірка прав адміністратора та показ кнопки
+//Перевірка прав адміністратора та показ кнопки
 function checkAndShowAdminButton() {
-    const token = localStorage.getItem('accessToken');
     const adminBtn = document.getElementById('adminPanelBtn');
 
     if (!adminBtn) {
@@ -53,49 +52,28 @@ function checkAndShowAdminButton() {
         return;
     }
 
-    if (!token) {
+    // БЕРЕМО РОЛЬ З localStorage.user
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('accessToken');
+
+    console.log('User from storage in checkAndShowAdminButton:', user);
+    console.log('User role:', user.role);
+
+    if (token && (user.role === 'Admin' || user.role === 'admin')) {
+        adminBtn.style.display = 'block';
+        console.log('✅ Admin button shown - user has Admin role');
+    } else {
         adminBtn.style.display = 'none';
-        return;
-    }
-
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log('Decoded token payload:', payload);
-
-        const userRole = payload.role || payload.Role || payload.userRole || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-        console.log('User role extracted:', userRole);
-
-        if (!userRole) {
-            console.log('Role not found in token, trying to get from user data...');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            console.log('User from localStorage:', user);
-
-            if (user.role === 'Admin' || user.role === 'admin') {
-                adminBtn.style.display = 'block';
-                console.log('Admin button shown - user role from localStorage:', user.role);
-                return;
-            }
-        }
-
-        if (userRole === 'Admin' || userRole === 'admin') {
-            adminBtn.style.display = 'block';
-            console.log('Admin button shown - user has Admin role:', userRole);
-        } else {
-            adminBtn.style.display = 'none';
-            console.log('Admin button hidden - user role:', userRole);
-        }
-    } catch (e) {
-        console.error('Error decoding token:', e);
-        adminBtn.style.display = 'none';
+        console.log('❌ Admin button hidden - user role:', user.role);
     }
 }
 
 function updateAuthUI() {
     const token = localStorage.getItem('accessToken');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
 
     console.log('updateAuthUI - token exists:', !!token);
-    console.log('updateAuthUI - user:', user.surname, user.name);
+    console.log('updateAuthUI - user:', user);
 
     if (token && (user.id || user.email)) {
         // АВТОРИЗОВАНИЙ
@@ -108,7 +86,7 @@ function updateAuthUI() {
 
         // Бічна панель
         $('#userName').text(`${user.surname || ''} ${user.name || ''}`.trim() || 'Користувач');
-        $('#userEmail').text(user.email || 'user@example.com');
+        $('#userEmail').text(user.email || user.contactInfo?.email || 'user@example.com');
 
         // Кнопки
         $('#createTournamentBtn').show();
