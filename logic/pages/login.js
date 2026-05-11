@@ -5,33 +5,27 @@ $(document).ready(function() {
         window.location.href = '/index.html';
         return;
     }
-
     $('#loginForm').on('submit', handleLogin);
 });
 
 async function handleLogin(e) {
     e.preventDefault();
-
     const email = $('#email').val().trim();
     const password = $('#password').val();
-
     if (!email || !password) {
         showError('Будь ласка, заповніть всі поля');
         return;
     }
-
     try {
         $('#loginBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Вхід...');
 
         const response = await window.authApi.login(email, password);
-
         if (response && response.accessToken) {
             // Зберігаємо токени та дані користувача
             localStorage.setItem('accessToken', response.accessToken);
             localStorage.setItem('refreshToken', response.refreshToken);
             localStorage.setItem('refreshTokenExpiry', response.refreshTokenExpiry);
             localStorage.setItem('user', JSON.stringify(response.user));
-
             showSuccess('Вхід успішний! Перенаправлення...');
             setTimeout(() => {
                 window.location.href = '/index.html';

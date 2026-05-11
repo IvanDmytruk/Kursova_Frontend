@@ -1,0 +1,110 @@
+.admin-sidebar {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 80px;
+}
+
+.admin-nav-item {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.admin-nav-item:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateX(5px);
+}
+
+.admin-nav-item.active {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.admin-nav-item i {
+    width: 25px;
+    margin-right: 10px;
+}
+
+.user-avatar-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.role-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.role-admin { background: #e94560; color: white; }
+.role-player { background: #28a745; color: white; }
+.role-moderator { background: #ffc107; color: #856404; }
+.role-user { background: #6c757d; color: white; }
+
+.ban-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.banned { background: #dc3545; color: white; }
+.active-user { background: #28a745; color: white; }
+
+.table-hover tbody tr {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
+}
+
+.request-pending { background: #ffc107; color: #856404; }
+.request-approved { background: #28a745; color: white; }
+.request-rejected { background: #dc3545; color: white; }
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.modal-lg-custom {
+    max-width: 800px;
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        position: static;
+        margin-bottom: 20px;
+    }
+
+    .admin-nav-item {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+}
