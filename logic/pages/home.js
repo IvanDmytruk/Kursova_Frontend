@@ -62,12 +62,27 @@ function checkAndShowAdminButton() {
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('Decoded token payload:', payload);
 
-        if (payload.role === 'Admin' || payload.role === 'admin') {
+        const userRole = payload.role || payload.Role || payload.userRole || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        console.log('User role extracted:', userRole);
+
+        if (!userRole) {
+            console.log('Role not found in token, trying to get from user data...');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            console.log('User from localStorage:', user);
+
+            if (user.role === 'Admin' || user.role === 'admin') {
+                adminBtn.style.display = 'block';
+                console.log('Admin button shown - user role from localStorage:', user.role);
+                return;
+            }
+        }
+
+        if (userRole === 'Admin' || userRole === 'admin') {
             adminBtn.style.display = 'block';
-            console.log('Admin button shown - user has Admin role');
+            console.log('Admin button shown - user has Admin role:', userRole);
         } else {
             adminBtn.style.display = 'none';
-            console.log('Admin button hidden - user role:', payload.role);
+            console.log('Admin button hidden - user role:', userRole);
         }
     } catch (e) {
         console.error('Error decoding token:', e);
@@ -75,7 +90,6 @@ function checkAndShowAdminButton() {
     }
 }
 
-// ОНОВЛЕНА ФУНКЦІЯ: Оновлення UI (гостьові кнопки / меню користувача / бічна панель)
 function updateAuthUI() {
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -574,7 +588,28 @@ window.selectSport = function(sport) {
     loadUpcomingMatches();
     loadActiveTournaments();
 };
+async function fetchCurrentUser() {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return null;
 
+        // Спробуємо отримати дані користувача з API
+        const response = await fetch(`${API_CONFIG.baseUrl}/api/User/me`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const user = await response.json();
+            localStorage.setItem('user', JSON.stringify(user));
+            return user;
+        }
+    } catch (error) {
+        console.error('Error fetching current user:', error);
+    }
+    return null;
+}
 // Експорт функцій
 window.loadUpcomingMatches = loadUpcomingMatches;
 window.loadActiveTournaments = loadActiveTournaments;
