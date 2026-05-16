@@ -1,25 +1,78 @@
 // admin.js
-const API_BASE = '';
 let currentPage = 1;
 let currentUserSearch = '';
 
-// Отримання токена
-function getToken() {
-    return localStorage.getItem('accessToken');
+// Використовуємо існуючий BaseApi з config.js
+class AdminApi extends BaseApi {
+    async request(url, options = {}) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
+        const token = localStorage.getItem('accessToken');
+        const headers = { ...this.defaultHeaders, ...options.headers };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Перевіряємо чи url вже повний або відносний
+        const fullUrl = url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+
+        try {
+            const response = await fetch(fullUrl, {
+                ...options,
+                headers: headers,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (response.status === 401) {
+                const newToken = await this.refreshToken();
+                if (newToken) {
+                    headers['Authorization'] = `Bearer ${newToken}`;
+                    const retryResponse = await fetch(fullUrl, {
+                        ...options,
+                        headers: headers,
+                        signal: controller.signal
+                    });
+                    return retryResponse.json();
+                } else {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login.html';
+                    throw new Error('Session expired');
+                }
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}`);
+            }
+
+            return response.json();
+        } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Запит перевищив час очікування');
+            }
+            throw error;
+        }
+    }
 }
 
-// Перевірка авторизації (ВИПРАВЛЕНО - беремо роль з localStorage)
+const adminApi = new AdminApi();
+
+// Перевірка авторизації
 function checkAuth() {
-    const token = getToken();
+    const token = localStorage.getItem('accessToken');
     if (!token) {
         window.location.href = '/login.html';
         return false;
     }
 
-    // БЕРЕМО РОЛЬ З localStorage.user (де вона точно є)
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    console.log('Admin page - user from storage:', user);
-    console.log('Admin page - user role:', user.role);
+    console.log('Admin user:', user);
 
     if (user.role !== 'Admin' && user.role !== 'admin') {
         alert('Доступ заборонено. Потрібні права адміністратора.');
@@ -27,7 +80,6 @@ function checkAuth() {
         return false;
     }
 
-    // Встановлюємо email для відображення
     const adminEmailSpan = document.getElementById('adminEmail');
     if (adminEmailSpan) {
         adminEmailSpan.textContent = user.email || user.contactInfo?.email || 'Admin';
@@ -36,71 +88,71 @@ function checkAuth() {
     return true;
 }
 
-// API запит (без змін)
-async function apiRequest(url, options = {}) {
-    const token = getToken();
-    const response = await fetch(`${API_BASE}${url}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-            ...options.headers
-        }
-    });
-
-    if (response.status === 401) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        window.location.href = '/login.html';
-        throw new Error('Неавторизований');
-    }
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || 'Помилка запиту');
-    }
-
-    return response.json();
-}
-
-// Завантаження статистики
+// Завантаження статистики - ВИКОРИСТОВУЄМО ПРАВИЛЬНІ ЕНДПОІНТИ
 async function loadStats() {
     try {
-        const stats = await apiRequest('/api/Admin/stats');
-        document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
-        document.getElementById('totalTournaments').textContent = stats.totalTournaments || 0;
-        document.getElementById('totalTeams').textContent = stats.totalTeams || 0;
-        document.getElementById('totalMatches').textContent = stats.totalMatches || 0;
-        document.getElementById('pendingRequests').textContent = stats.pendingRoleRequests || 0;
+        // Використовуємо ендпоінти з API_CONFIG
+        const [users, tournaments, teams, matches] = await Promise.all([
+            adminApi.get(API_CONFIG.endpoints.users).catch(() => []),
+            adminApi.get(API_CONFIG.endpoints.tournaments).catch(() => []),
+            adminApi.get(API_CONFIG.endpoints.teams).catch(() => []),
+            adminApi.get(API_CONFIG.endpoints.matches).catch(() => [])
+        ]);
 
-        const pendingCount = stats.pendingRoleRequests || 0;
-        const pendingBadge = document.getElementById('pendingCount');
-        if (pendingCount > 0) {
-            pendingBadge.textContent = pendingCount;
-            pendingBadge.style.display = 'inline-block';
-        } else {
-            pendingBadge.style.display = 'none';
-        }
+        const usersCount = Array.isArray(users) ? users.length : (users.total || users.items?.length || 0);
+        const tournamentsCount = Array.isArray(tournaments) ? tournaments.length : (tournaments.total || tournaments.items?.length || 0);
+        const teamsCount = Array.isArray(teams) ? teams.length : (teams.total || teams.items?.length || 0);
+        const matchesCount = Array.isArray(matches) ? matches.length : (matches.total || matches.items?.length || 0);
+
+        document.getElementById('totalUsers').textContent = usersCount;
+        document.getElementById('totalTournaments').textContent = tournamentsCount;
+        document.getElementById('totalTeams').textContent = teamsCount;
+        document.getElementById('totalMatches').textContent = matchesCount;
+        document.getElementById('pendingRequests').textContent = '0';
+
+        console.log('Stats loaded:', { usersCount, tournamentsCount, teamsCount, matchesCount });
+
     } catch (error) {
         console.error('Помилка завантаження статистики:', error);
-        // Показуємо помилку в UI
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'alert alert-danger m-3';
-        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Помилка завантаження статистики: ${error.message}`;
-        document.querySelector('#stats-tab').prepend(errorDiv);
+        const statsContainer = document.querySelector('#stats-tab .stats-grid');
+        if (statsContainer) {
+            statsContainer.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger m-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Помилка завантаження статистики: ${error.message}
+                    </div>
+                </div>
+            `;
+        }
     }
 }
 
 // Завантаження користувачів
 async function loadUsers(page = 1, search = '') {
     try {
-        let url = `/api/Admin/users?page=${page}&pageSize=20`;
+        let url = `${API_CONFIG.endpoints.users}?page=${page}&limit=20`;
         if (search) {
             url += `&search=${encodeURIComponent(search)}`;
         }
-        const data = await apiRequest(url);
-        const users = data.users || data;
-        const total = data.total || users.length;
+        const data = await adminApi.get(url);
+
+        // Обробляємо різні формати відповіді
+        let users = [];
+        let total = 0;
+
+        if (Array.isArray(data)) {
+            users = data;
+            total = data.length;
+        } else if (data.users) {
+            users = data.users;
+            total = data.total || users.length;
+        } else if (data.items) {
+            users = data.items;
+            total = data.total || users.length;
+        } else {
+            users = [];
+        }
 
         renderUsersTable(users);
         renderPagination(page, Math.ceil(total / 20), 'usersPagination', loadUsers);
@@ -108,8 +160,9 @@ async function loadUsers(page = 1, search = '') {
         console.error('Помилка завантаження користувачів:', error);
         document.getElementById('usersTableBody').innerHTML = `
             <tr><td colspan="6" class="text-center text-danger py-5">
-                <i class="fas fa-exclamation-triangle"></i> Помилка завантаження: ${error.message}
-            </td></tr>
+                <i class="fas fa-exclamation-triangle"></i> Помилка: ${error.message}
+            </td>
+        </tr>
         `;
     }
 }
@@ -133,7 +186,7 @@ function renderUsersTable(users) {
                     </div>
                 </div>
             </td>
-            <td>${user.contactInfo?.email || 'N/A'}</td>
+            <td>${user.contactInfo?.email || user.email || 'N/A'}</td>
             <td><span class="role-badge role-${(user.role || 'User').toLowerCase()}">${user.role || 'User'}</span></td>
             <td>
                 <span class="ban-status ${user.isBanned ? 'banned' : 'active-user'}">
@@ -193,52 +246,43 @@ function renderPagination(currentPage, totalPages, elementId, loadFunction) {
 
 // Завантаження запитів на роль
 async function loadRoleRequests() {
-    try {
-        const requests = await apiRequest('/api/Admin/role-requests?status=Pending');
-        renderRoleRequests(requests);
-    } catch (error) {
-        console.error('Помилка завантаження запитів:', error);
-        document.getElementById('requestsTableBody').innerHTML = `
-            <tr><td colspan="6" class="text-center text-danger py-5">Помилка завантаження: ${error.message}</td></tr>
-        `;
-    }
-}
-
-function renderRoleRequests(requests) {
     const tbody = document.getElementById('requestsTableBody');
-    if (!requests || requests.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5">Немає активних запитів</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = requests.map(req => `
-        <tr>
-            <td><strong>${req.userName || req.userId}</strong></td>
-            <td>${req.userEmail || 'N/A'}</td>
-            <td><span class="role-badge role-${req.requestedRole.toLowerCase()}">${req.requestedRole}</span></td>
-            <td><span class="badge request-pending">${req.status}</span></td>
-            <td>${new Date(req.createdAt).toLocaleDateString()}</td>
-            <td>
-                <button class="btn btn-sm btn-success" onclick="approveRequest('${req.id}')">
-                    <i class="fas fa-check"></i> Підтвердити
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="rejectRequest('${req.id}')">
-                    <i class="fas fa-times"></i> Відхилити
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = `
+        <tr><td colspan="6" class="text-center py-5 text-muted">
+            <i class="fas fa-info-circle me-2"></i>Функція в розробці
+        </td></tr>
+    `;
 }
 
 // Завантаження топ гравців
 async function loadPlayersStats() {
     try {
-        const players = await apiRequest('/api/Admin/players/stats?limit=20');
-        renderPlayersStats(players);
+        const users = await adminApi.get(API_CONFIG.endpoints.users);
+        let players = [];
+
+        if (Array.isArray(users)) {
+            players = users.filter(u => u.role === 'Player');
+        } else if (users.users) {
+            players = users.users.filter(u => u.role === 'Player');
+        } else if (users.items) {
+            players = users.items.filter(u => u.role === 'Player');
+        }
+
+        const stats = players.map((player, index) => ({
+            id: player.id,
+            name: player.name,
+            surname: player.surname,
+            wins: 0,
+            losses: 0,
+            points: 0,
+            matchesPlayed: 0
+        }));
+
+        renderPlayersStats(stats);
     } catch (error) {
         console.error('Помилка завантаження топ гравців:', error);
         document.getElementById('playersStatsBody').innerHTML = `
-            <tr><td colspan="6" class="text-center text-danger py-5">Помилка завантаження: ${error.message}</td></tr>
+            <tr><td colspan="6" class="text-center text-danger py-5">Помилка: ${error.message}</td></tr>
         `;
     }
 }
@@ -268,10 +312,7 @@ function renderPlayersStats(players) {
 }
 
 // Дії з користувачами
-let currentUserId = null;
-
 function openChangeRoleModal(userId, currentRole) {
-    currentUserId = userId;
     document.getElementById('changeRoleUserId').value = userId;
     document.getElementById('newRole').value = currentRole;
     new bootstrap.Modal(document.getElementById('changeRoleModal')).show();
@@ -282,10 +323,7 @@ async function confirmChangeRole() {
     const newRole = document.getElementById('newRole').value;
 
     try {
-        await apiRequest(`/api/Admin/users/${userId}/role`, {
-            method: 'PUT',
-            body: JSON.stringify(newRole)
-        });
+        await adminApi.put(`${API_CONFIG.endpoints.users}/${userId}`, { role: newRole });
         alert('Роль успішно змінено');
         bootstrap.Modal.getInstance(document.getElementById('changeRoleModal')).hide();
         loadUsers(currentPage, currentUserSearch);
@@ -295,7 +333,6 @@ async function confirmChangeRole() {
 }
 
 function openBanModal(userId) {
-    currentUserId = userId;
     document.getElementById('banUserId').value = userId;
     document.getElementById('banReason').value = '';
     new bootstrap.Modal(document.getElementById('banUserModal')).show();
@@ -307,10 +344,7 @@ async function confirmBanUser() {
     const reason = document.getElementById('banReason').value;
 
     try {
-        await apiRequest(`/api/Admin/users/${userId}/ban`, {
-            method: 'POST',
-            body: JSON.stringify({ minutes, reason })
-        });
+        await adminApi.post(`${API_CONFIG.endpoints.users}/${userId}/ban`, { minutes, reason });
         alert('Користувача заблоковано');
         bootstrap.Modal.getInstance(document.getElementById('banUserModal')).hide();
         loadUsers(currentPage, currentUserSearch);
@@ -323,7 +357,7 @@ async function unbanUser(userId) {
     if (!confirm('Розблокувати цього користувача?')) return;
 
     try {
-        await apiRequest(`/api/Admin/users/${userId}/unban`, { method: 'DELETE' });
+        await adminApi.delete(`${API_CONFIG.endpoints.users}/${userId}/unban`);
         alert('Користувача розблоковано');
         loadUsers(currentPage, currentUserSearch);
     } catch (error) {
@@ -331,56 +365,30 @@ async function unbanUser(userId) {
     }
 }
 
-// Дії з рольовими запитами
+// Заглушки
 async function approveRequest(requestId) {
-    if (!confirm('Підтвердити цей запит?')) return;
-
-    try {
-        await apiRequest(`/api/Admin/role-requests/${requestId}/approve`, { method: 'PUT' });
-        alert('Запит підтверджено');
-        loadRoleRequests();
-        loadStats();
-        if (document.querySelector('[data-tab="users"].active')) loadUsers();
-    } catch (error) {
-        alert('Помилка: ' + error.message);
-    }
+    alert('Функція в розробці');
 }
 
 async function rejectRequest(requestId) {
-    if (!confirm('Відхилити цей запит?')) return;
-
-    try {
-        await apiRequest(`/api/Admin/role-requests/${requestId}/reject`, { method: 'DELETE' });
-        alert('Запит відхилено');
-        loadRoleRequests();
-        loadStats();
-    } catch (error) {
-        alert('Помилка: ' + error.message);
-    }
+    alert('Функція в розробці');
 }
 
 // Перемикання вкладок
 function switchTab(tabName) {
     document.querySelectorAll('.admin-tab').forEach(tab => tab.style.display = 'none');
-    document.getElementById(`${tabName}-tab`).style.display = 'block';
+    const activeTab = document.getElementById(`${tabName}-tab`);
+    if (activeTab) activeTab.style.display = 'block';
 
     document.querySelectorAll('.admin-nav-item').forEach(item => item.classList.remove('active'));
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    const activeNav = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeNav) activeNav.classList.add('active');
 
     switch(tabName) {
-        case 'stats':
-            loadStats();
-            break;
-        case 'users':
-            currentPage = 1;
-            loadUsers();
-            break;
-        case 'role-requests':
-            loadRoleRequests();
-            break;
-        case 'players-stats':
-            loadPlayersStats();
-            break;
+        case 'stats': loadStats(); break;
+        case 'users': currentPage = 1; loadUsers(); break;
+        case 'role-requests': loadRoleRequests(); break;
+        case 'players-stats': loadPlayersStats(); break;
     }
 }
 
@@ -391,7 +399,9 @@ function logout() {
     localStorage.removeItem('refreshTokenExpiry');
     localStorage.removeItem('user');
     localStorage.removeItem('currentUser');
-    window.location.href = '/login.html';
+
+    // Перенаправляємо на головну сторінку (index.html)
+    window.location.href = '/index.html';
 }
 
 // Ініціалізація
@@ -399,13 +409,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Admin page loading...');
     if (!checkAuth()) return;
 
-    console.log('Auth passed, initializing admin panel...');
-
     // Обробники меню
     document.querySelectorAll('.admin-nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            switchTab(item.dataset.tab);
-        });
+        item.addEventListener('click', () => switchTab(item.dataset.tab));
     });
 
     // Пошук користувачів
@@ -422,10 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Завантажуємо стартову вкладку
-    loadStats();
-
-    // Додаємо обробник для кнопки виходу в адмінці
+    // Кнопка виходу
     const logoutBtn = document.querySelector('.btn-danger');
     if (logoutBtn) {
         logoutBtn.onclick = (e) => {
@@ -433,4 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logout();
         };
     }
+
+    loadStats();
 });

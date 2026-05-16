@@ -184,10 +184,45 @@ function updateSportButtonText(sport) {
         'Hearts_of_Iron_4': '🌍 Hearts of Iron IV',
         'Civilization_6': '🏛️ Civilization VI'
     };
+ /*
+ const sportBackgrounds = {
+        'all': '/images/backgrounds/default-bg.jpg',
+        'Football': '/images/backgrounds/football-bg.jpg',
+        'Basketball': '/images/backgrounds/basketball-bg.jpg',
+        'Volleyball': '/images/backgrounds/volleyball-bg.jpg',
+        'Handball': '/images/backgrounds/handball-bg.jpg',
+        'Tennis': '/images/backgrounds/tennis-bg.jpg',
+        'Boxing': '/images/backgrounds/boxing-bg.jpg',
+        'Judo': '/images/backgrounds/judo-bg.jpg',
+        'Karate': '/images/backgrounds/karate-bg.jpg',
+        'Chess': '/images/backgrounds/chess-bg.jpg',
+        'Checkers': '/images/backgrounds/checkers-bg.jpg',
+        'Contr_Strike_2': '/images/backgrounds/cs2-bg.jpg',
+        'Dota_2': '/images/backgrounds/dota2-bg.jpg',
+        'Mobile_Legends_Bang_Bang': '/images/backgrounds/mlbb-bg.jpg',
+        'Hearts_of_Iron_4': '/images/backgrounds/hoi4-bg.jpg',
+        'Civilization_6': '/images/backgrounds/civ6-bg.jpg'
+    };
+    */
     const btn = document.getElementById('selectedSportName');
     if (btn) btn.textContent = sportNames[sport] || sport;
-}
 
+    changeBackgroundBySport(sport, sportBackgrounds);
+}
+function changeBackgroundBySport(sport, backgrounds) {
+    const imageUrl = backgrounds[sport] || backgrounds['all'];
+
+    // Додаємо CSS змінну для фону
+    document.body.style.backgroundImage = `url('${imageUrl}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+    document.body.style.backgroundRepeat = 'no-repeat';
+
+    // Додаємо напівпрозорий оверлей для читабельності тексту
+    document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+    document.body.style.backgroundBlendMode = 'overlay';
+}
 function getSportEndpoint(sport) {
     if (sport === 'all') return null;
     const sportEndpointMap = {
