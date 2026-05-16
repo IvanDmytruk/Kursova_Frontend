@@ -206,8 +206,7 @@ function updateSportButtonText(sport) {
     */
     const btn = document.getElementById('selectedSportName');
     if (btn) btn.textContent = sportNames[sport] || sport;
-
-    changeBackgroundBySport(sport, sportBackgrounds);
+   // changeBackgroundBySport(sport, sportBackgrounds);
 }
 function changeBackgroundBySport(sport, backgrounds) {
     const imageUrl = backgrounds[sport] || backgrounds['all'];
