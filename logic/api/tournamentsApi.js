@@ -17,6 +17,10 @@ class TournamentsApi extends BaseApi {
         return this.get(`${this.baseUrl}${this.endpoint}/active`);
     }
 
+    async getActiveBySport(sport) {
+        return this.get(`${this.baseUrl}${this.endpoint}/active?sport=${sport}`);
+    }
+
     async searchByName(name) {
         return this.get(`${this.baseUrl}${this.endpoint}/byname/${encodeURIComponent(name)}`);
     }
@@ -33,23 +37,99 @@ class TournamentsApi extends BaseApi {
         return this.put(`${this.baseUrl}${this.endpoint}/${id}`, tournamentData);
     }
 
-    async delete(id) {
+    async deleteTournament(id) {
         return this.delete(`${this.baseUrl}${this.endpoint}/${id}`);
     }
 
     async addTeam(tournamentId, teamId) {
-        return this.post(`${this.baseUrl}${this.endpoint}/${tournamentId}/teams/${teamId}`, {});
+        console.log('📤 addTeam called with:', { tournamentId, teamId });
+        console.log('🔑 Token:', localStorage.getItem('accessToken')?.substring(0, 50) + '...');
+
+        try {
+            const url = `${this.baseUrl}${this.endpoint}/${tournamentId}/teams/${teamId}`;
+            console.log('📍 URL:', url);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            });
+
+            console.log('📥 Response status:', response.status);
+            console.log('📥 Response status text:', response.statusText);
+
+            const responseText = await response.text();
+            console.log('📥 Response body:', responseText);
+
+            if (response.ok) {
+                console.log('✅ Team added successfully');
+                return true;
+            }
+
+            let errorMessage = `Failed to add team (${response.status})`;
+            try {
+                const errorJson = JSON.parse(responseText);
+                errorMessage = errorJson.message || errorJson.title || errorMessage;
+            } catch {
+                if (responseText) errorMessage = responseText;
+            }
+
+            throw new Error(errorMessage);
+        } catch (error) {
+            console.error('❌ Add team error:', error);
+            throw error;
+        }
     }
 
     async removeTeam(tournamentId, teamId) {
-        return this.delete(`${this.baseUrl}${this.endpoint}/${tournamentId}/teams/${teamId}`);
+        console.log('📤 removeTeam called with:', { tournamentId, teamId });
+        console.log('🔑 Token:', localStorage.getItem('accessToken')?.substring(0, 50) + '...');
+
+        try {
+            const url = `${this.baseUrl}${this.endpoint}/${tournamentId}/teams/${teamId}`;
+            console.log('📍 URL:', url);
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            });
+
+            console.log('📥 Response status:', response.status);
+            console.log('📥 Response status text:', response.statusText);
+
+            const responseText = await response.text();
+            console.log('📥 Response body:', responseText);
+
+            if (response.ok) {
+                console.log('✅ Team removed successfully');
+                return true;
+            }
+
+            let errorMessage = `Failed to remove team (${response.status})`;
+            try {
+                const errorJson = JSON.parse(responseText);
+                errorMessage = errorJson.message || errorJson.title || errorMessage;
+            } catch {
+                if (responseText) errorMessage = responseText;
+            }
+
+            throw new Error(errorMessage);
+        } catch (error) {
+            console.error('❌ Remove team error:', error);
+            throw error;
+        }
     }
-    async getActiveBySport(sport) {
-        return this.get(`${this.baseUrl}${this.endpoint}/active?sport=${sport}`);
+
+    async registerTeam(tournamentId, teamId) {
+        return this.post(`${this.baseUrl}${this.endpoint}/${tournamentId}/register`, { teamId: teamId });
     }
-    async create(tournamentData) {
-        console.log('Sending to server:', JSON.stringify(tournamentData, null, 2));
-        return this.post(`${this.baseUrl}${this.endpoint}`, tournamentData);
+
+    async registerPlayer(tournamentId) {
+        return this.post(`${this.baseUrl}${this.endpoint}/${tournamentId}/register`, {});
     }
 }
 

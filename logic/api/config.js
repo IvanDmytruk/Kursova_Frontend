@@ -26,9 +26,8 @@ class BaseApi {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-        // Додаємо токен до заголовків, якщо він є
         const token = localStorage.getItem('accessToken');
-        const headers = { ...this.defaultHeaders, ...options.headers };
+        const headers = {...this.defaultHeaders, ...options.headers};
 
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
@@ -43,30 +42,50 @@ class BaseApi {
 
             clearTimeout(timeoutId);
 
-            // Якщо 401 Unauthorized - пробуємо оновити токен
             if (response.status === 401) {
                 const newToken = await this.refreshToken();
                 if (newToken) {
-                    // Повторюємо запит з новим токеном
                     headers['Authorization'] = `Bearer ${newToken}`;
                     const retryResponse = await fetch(url, {
                         ...options,
                         headers: headers,
                         signal: controller.signal
                     });
-                    return retryResponse.json();
+                    const contentType = retryResponse.headers.get('content-type');
+                    if (retryResponse.status !== 204 && contentType && contentType.includes('application/json')) {
+                        return retryResponse.json();
+                    }
+                    return null;
                 } else {
                     window.location.href = '/pages/login.html';
                     throw new Error('Session expired');
                 }
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}`);
+            if (response.status === 204) {
+                return null;
             }
 
-            return response.json();
+            if (!response.ok) {
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorData.title || errorMessage;
+                } catch (e) {
+                    errorMessage = await response.text().catch(() => errorMessage);
+                }
+                throw new Error(errorMessage);
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const text = await response.text();
+                if (!text) return null;
+                return JSON.parse(text);
+            }
+
+            return null;
+
         } catch (error) {
             clearTimeout(timeoutId);
             if (error.name === 'AbortError') {
@@ -83,8 +102,8 @@ class BaseApi {
         try {
             const response = await fetch(`${this.baseUrl}/api/Auth/refresh`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refreshToken })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refreshToken})
             });
 
             if (response.ok) {
@@ -104,12 +123,25 @@ class BaseApi {
         return null;
     }
 
-    get(url) { return this.request(url, { method: 'GET' }); }
-    post(url, data) { return this.request(url, { method: 'POST', body: JSON.stringify(data) }); }
-    put(url, data) { return this.request(url, { method: 'PUT', body: JSON.stringify(data) }); }
-    delete(url) { return this.request(url, { method: 'DELETE' }); }
-    patch(url, data) { return this.request(url, { method: 'PATCH', body: JSON.stringify(data) }); }
-}
+    get(url) {
+        return this.request(url, {method: 'GET'});
+    }
 
+    post(url, data) {
+        return this.request(url, {method: 'POST', body: JSON.stringify(data)});
+    }
+
+    put(url, data) {
+        return this.request(url, {method: 'PUT', body: JSON.stringify(data)});
+    }
+
+    delete(url) {
+        return this.request(url, {method: 'DELETE'});
+    }
+
+    patch(url, data) {
+        return this.request(url, {method: 'PATCH', body: JSON.stringify(data)});
+    }
+}
 window.API_CONFIG = API_CONFIG;
 window.BaseApi = BaseApi;
