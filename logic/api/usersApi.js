@@ -33,7 +33,7 @@ class UsersApi extends BaseApi {
     }
 
     async delete(id) {
-        return this.delete(`${this.baseUrl}${this.endpoint}/${id}`);
+    return super.delete(`${this.baseUrl}${this.endpoint}/${id}`);
     }
 }
 
