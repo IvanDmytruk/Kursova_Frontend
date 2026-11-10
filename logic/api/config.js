@@ -180,22 +180,31 @@ class BaseApi {
                 return null;
             }
 
-            if (!response.ok) {
-                let message =
-                    `HTTP ${response.status}`;
+            
+if (!response.ok) {
+    const responseText = await response.text();
 
-                try {
-                    const data = await response.json();
+    console.error('API request failed:', {
+        url: new URL(url, this.baseUrl).pathname,
+        method: options.method || 'GET',
+        status: response.status,
+        response: responseText
+    });
 
-                    message =
-                        data.message ||
-                        data.title ||
-                        message;
-                } catch {
-                }
+    let message = `HTTP ${response.status}`;
 
-                throw new Error(message);
-            }
+    try {
+        const data = JSON.parse(responseText);
+        message = data.message || data.title || message;
+    } catch {
+        if (responseText) {
+            message = responseText;
+        }
+    }
+
+    throw new Error(message);
+}
+
 
             const contentType =
                 response.headers.get('content-type');

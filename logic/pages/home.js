@@ -432,24 +432,13 @@ function formatDate(date) {
 async function createTournament() {
     const form = $('#createTournamentForm');
 
-    let selectedSport = currentSport;
 
-    if (selectedSport === 'all') {
-        const sport = prompt('Введіть вид спорту для турніру (Football, Basketball, Boxing, Chess, etc.):');
-        if (!sport) {
-            alert('Виберіть вид спорту');
-            return;
-        }
-        selectedSport = sport;
-    }
+const selectedSport = form.find('[name="sportName"]').val();
 
-    // Маппінг українських назв на англійські
-    const sportMapping = {
-        'Футбол': 'Football', 'Баскетбол': 'Basketball', 'Волейбол': 'Volleyball',
-        'Гандбол': 'Handball', 'Теніс': 'Tennis', 'Бокс': 'Boxing',
-        'Дзюдо': 'Judo', 'Карате': 'Karate', 'Шахи': 'Chess', 'Шашки': 'Checkers'
-    };
-    if (sportMapping[selectedSport]) selectedSport = sportMapping[selectedSport];
+if (!selectedSport) {
+    alert('Виберіть вид спорту для турніру');
+    return;
+}
 
     // Конвертація дати в ISO формат
     const startDateRaw = form.find('[name="startDate"]').val();
