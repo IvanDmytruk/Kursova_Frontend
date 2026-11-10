@@ -15,24 +15,23 @@ $(document).ready(function() {
 function updateAuthUI() {
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isAdmin = user.role === 'Admin' || user.isAdmin === true;
 
     if (token && user.id) {
         $('#guestButtons').hide();
         $('#userMenu').show();
-        $('#userNameNav').text(`${user.surname || ''} ${user.name || ''}`.trim() || 'Профіль');
 
-        if (isAdmin) {
-            $('#editTournamentBtn').show();
-            $('#addTeamBtn').show();
-        }
+        $('#userNameNav').text(
+            `${user.surname || ''} ${user.name || ''}`.trim() || 'Профіль'
+        );
     } else {
         $('#guestButtons').show();
         $('#userMenu').hide();
-        $('#editTournamentBtn').hide();
-        $('#addTeamBtn').hide();
     }
+
+    $('#editTournamentBtn').hide();
+    $('#addTeamBtn').hide();
 }
+
 
 // Отримання ID турніру з URL
 function getTournamentId() {
@@ -58,11 +57,14 @@ async function loadTournamentDetails() {
         }
 
         currentTournament = tournament;
+        updateTournamentManagement();
         displayTournamentInfo(tournament);
 
         tournamentTeams = tournament.tournamentParticipants || [];
         displayParticipants(tournamentTeams);
-
+        if (window.loadCompetition) {
+         window.loadCompetition(tournament);
+        }
         $('#loadingSpinner').hide();
         $('#tournamentContent').show();
 
@@ -92,34 +94,52 @@ function displayTournamentInfo(tournament) {
 }
 
 // Відображення списку учасників
+
 function displayParticipants(teams) {
-    const isAdmin = isUserAdmin();
+    const canEditParticipants = isUserAdmin() &&
+        ['Draft', 'Registration'].includes(currentTournament?.status);
 
     if (!teams || teams.length === 0) {
         $('#participantsList').html(`
             <div class="col-12 text-center text-muted py-4">
                 <i class="fas fa-users fa-2x mb-2"></i>
                 <p>Учасників поки немає</p>
-                ${isAdmin ? '<button class="btn btn-sm btn-primary mt-2" onclick="$(\'#addTeamBtn\').click()"><i class="fas fa-plus"></i> Додати першу команду</button>' : ''}
+                ${canEditParticipants ? `
+                    <button class="btn btn-sm btn-primary mt-2"
+                            onclick="$('#addTeamBtn').click()">
+                        <i class="fas fa-plus"></i> Додати першу команду
+                    </button>
+                ` : ''}
             </div>
         `);
         return;
     }
 
     let html = '';
+
     teams.forEach(team => {
         html += `
             <div class="col-md-6 col-lg-4 mb-3">
-                <div class="team-card" data-team-id="${team.id}">
+                <div class="team-card" data-team-id="${escapeHtml(team.id)}">
                     <div class="team-card-logo">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h6 class="team-card-name">${escapeHtml(team.teamName || 'Без назви')}</h6>
+
+                    <h6 class="team-card-name">
+                        ${escapeHtml(team.teamName || 'Без назви')}
+                    </h6>
+
                     <div class="team-card-stats">
-                        <small>Капітан: ${escapeHtml(team.captainName || 'Не вказано')}</small>
+                        <small>
+                            Капітан:
+                            ${escapeHtml(team.captainName || 'Не вказано')}
+                        </small>
                     </div>
-                    ${isAdmin ? `
-                        <button class="btn btn-sm btn-danger mt-2 remove-team-btn" data-team-id="${team.id}" data-team-name="${escapeHtml(team.teamName || team.name)}">
+
+                    ${canEditParticipants ? `
+                        <button class="btn btn-sm btn-danger mt-2 remove-team-btn"
+                                data-team-id="${escapeHtml(team.id)}"
+                                data-team-name="${escapeHtml(team.teamName || 'Без назви')}">
                             <i class="fas fa-trash"></i> Видалити
                         </button>
                     ` : ''}
@@ -130,21 +150,25 @@ function displayParticipants(teams) {
 
     $('#participantsList').html(html);
 
-    if (isAdmin) {
-        $('.remove-team-btn').click(function(e) {
-            e.stopPropagation();
-            const teamId = $(this).data('team-id');
-            const teamName = $(this).data('team-name');
-            showDeleteConfirmation(teamId, teamName);
-        });
-    }
+    $('.remove-team-btn').on('click', function(e) {
+        e.stopPropagation();
 
-    $('.team-card').click(function(e) {
-        if (!$(e.target).hasClass('remove-team-btn') && !$(e.target).parent().hasClass('remove-team-btn')) {
-            const teamId = $(this).data('team-id');
-            if (teamId) {
-                window.location.href = `/pages/team-details.html?id=${teamId}`;
-            }
+        const teamId = $(this).attr('data-team-id');
+        const teamName = $(this).attr('data-team-name');
+
+        showDeleteConfirmation(teamId, teamName);
+    });
+
+    $('.team-card').on('click', function(e) {
+        if ($(e.target).closest('.remove-team-btn').length) {
+            return;
+        }
+
+        const teamId = $(this).attr('data-team-id');
+
+        if (teamId) {
+            window.location.href =
+                `/pages/team-details.html?id=${encodeURIComponent(teamId)}`;
         }
     });
 }
@@ -170,7 +194,6 @@ async function loadAllTeamsForAdding() {
         `);
     }
 }
-
 // Відображення доступних команд
 function displayAvailableTeams(teams) {
     if (!teams || teams.length === 0) {
@@ -400,18 +423,39 @@ function getTournamentTypeText(type) {
     return types[type] || type;
 }
 
-function getTournamentStatus(tournament) {
-    const now = new Date();
-    const start = new Date(tournament.startDate);
-    const end = tournament.endDate ? new Date(tournament.endDate) : null;
 
-    if (now < start) {
-        return { text: 'Заплановано', class: 'bg-secondary' };
-    } else if (end && now > end) {
-        return { text: 'Завершено', class: 'bg-success' };
-    } else {
-        return { text: 'Активний', class: 'bg-primary' };
-    }
+function getTournamentStatus(tournament) {
+    const statuses = {
+        Draft: {
+            text: 'Чернетка',
+            class: 'bg-secondary'
+        },
+        Registration: {
+            text: 'Реєстрація відкрита',
+            class: 'bg-primary'
+        },
+        Ready: {
+            text: 'Готовий до початку',
+            class: 'bg-warning'
+        },
+        InProgress: {
+            text: 'Триває',
+            class: 'bg-primary'
+        },
+        Completed: {
+            text: 'Завершено',
+            class: 'bg-success'
+        },
+        Cancelled: {
+            text: 'Скасовано',
+            class: 'bg-secondary'
+        }
+    };
+
+    return statuses[tournament.status] || {
+        text: tournament.status || 'Невідомий',
+        class: 'bg-secondary'
+    };
 }
 
 function formatDate(dateStr) {
@@ -420,15 +464,42 @@ function formatDate(dateStr) {
     return date.toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+
 function formatDateTimeLocal(dateStr) {
+    if (!dateStr) return '';
+
     const date = new Date(dateStr);
-    return date.toISOString().slice(0, 16);
+
+    if (Number.isNaN(date.getTime())) return '';
+
+    const pad = number => String(number).padStart(2, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function isUserAdmin() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return user.role === 'Admin' || user.isAdmin === true;
+
+    const userId = String(user.id ?? user.Id ?? '');
+    const creatorId = String(currentTournament?.createdBy ?? '');
+
+    return !!localStorage.getItem('accessToken') && (
+        user.role === 'Admin' ||
+        user.isAdmin === true ||
+        (userId !== '' && userId === creatorId)
+    );
 }
+
+function updateTournamentManagement() {
+    const canManage = isUserAdmin();
+
+    const canEdit = canManage &&
+        ['Draft', 'Registration'].includes(currentTournament?.status);
+
+    $('#editTournamentBtn').toggle(canEdit);
+    $('#addTeamBtn').toggle(canEdit);
+}
+
 
 function escapeHtml(str) {
     if (!str) return '';

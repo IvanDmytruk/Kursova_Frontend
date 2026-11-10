@@ -44,45 +44,56 @@ class MatchesApi extends BaseApi {
     async update(id, matchData) {
         return this.put(`${this.baseUrl}${this.endpoint}/${id}`, matchData);
     }
-
+ 
     async delete(id) {
-        return this.delete(`${this.baseUrl}${this.endpoint}/${id}`);
+     return super.delete(`${this.baseUrl}${this.endpoint}/${id}`);
     }
 
+    async generateSwissRound(tournamentId) {
+    return this.post(
+        `${this.baseUrl}${this.endpoint}/tournament/${tournamentId}/generate-swiss-round`
+    );
+}
 
-// Методи для вікна матчів
-    // Отримати статистику матчу
+async updateResult(matchId, homeScore, awayScore) {
+    return this.patch(
+        `${this.baseUrl}${this.endpoint}/${matchId}/result`,
+        { homeScore, awayScore }
+    );
+}
+
     async getStats(matchId) {
         return this.get(`${this.baseUrl}${this.endpoint}/${matchId}/stats`);
     }
 
-    // Оновити статистику матчу
     async updateStats(matchId, statsData) {
         return this.put(`${this.baseUrl}${this.endpoint}/${matchId}/stats`, statsData);
     }
 
-    // Отримати події матчу
     async getEvents(matchId) {
         return this.get(`${this.baseUrl}${this.endpoint}/${matchId}/events`);
     }
 
-    // Додати подію матчу (гол, заміна, картка)
     async addEvent(matchId, eventData) {
         return this.post(`${this.baseUrl}${this.endpoint}/${matchId}/events`, eventData);
     }
 
-    // Оновити рахунок
     async updateScore(matchId, homeScore, awayScore) {
-        return this.put(`${this.baseUrl}${this.endpoint}/${matchId}/score`, { homeScore, awayScore });
+        return this.updateResult(matchId, homeScore, awayScore);
     }
-
-    // Оновити статус матчу
     async updateStatus(matchId, status) {
         return this.put(`${this.baseUrl}${this.endpoint}/${matchId}/status`, { status });
     }
     async getUpcomingBySport(sport) {
         return this.get(`${this.baseUrl}${this.endpoint}/upcoming?sport=${sport}`);
     }
+
+async generateRoundRobin(tournamentId) {
+    return this.post(
+        `${this.baseUrl}${this.endpoint}/tournament/${tournamentId}/generate-round-robin`
+    );
+}
+
 }
 
 window.matchesApi = new MatchesApi();

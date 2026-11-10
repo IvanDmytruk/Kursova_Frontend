@@ -187,6 +187,36 @@ async function createTournament() {
     const form = $('#createTournamentForm');
     let selectedSport = currentSport === 'all' ? $('#tournamentSportSelect').val() : currentSport;
 
+const selectedType = form.find('[name="tournamentType"]').val();
+const isSwiss = selectedType === 'SwissSystem';
+const swissMode = $('#swissMode').val();
+
+const swissSettings = isSwiss ? {
+    swissMode: swissMode,
+    roundsCount: swissMode === 'FixedRounds'
+        ? Number($('#swissRoundsCount').val())
+        : 0,
+    winsToAdvance: Number($('#swissWins').val()),
+    lossesToEliminate: Number($('#swissLosses').val()),
+    allowRematches: $('#swissRematches').is(':checked'),
+    allowDraws: $('#swissDraws').is(':checked')
+} : null;
+
+if (isSwiss) {
+    const invalidRounds =
+        swissMode === 'FixedRounds' && swissSettings.roundsCount < 1;
+
+    const invalidThresholds =
+        swissMode === 'WinLossThreshold' &&
+        (swissSettings.winsToAdvance < 1 ||
+         swissSettings.lossesToEliminate < 1);
+
+    if (invalidRounds || invalidThresholds) {
+        showNotification('Перевір налаштування Swiss', 'error');
+        return;
+    }
+}
+
     const formData = {
         tournamentName: form.find('[name="tournamentName"]').val(),
         tournamentDescription: form.find('[name="tournamentDescription"]').val(),
@@ -197,7 +227,9 @@ async function createTournament() {
         endDate: form.find('[name="endDate"]').val() ? new Date(form.find('[name="endDate"]').val()).toISOString() : null,
         sportName: selectedSport,
         maxParticipants: parseInt(form.find('[name="maxParticipants"]').val()) || 0,
-        createdBy: JSON.parse(localStorage.getItem('user') || '{}').id || null
+        createdBy: JSON.parse(localStorage.getItem('user') || '{}').id || null,
+        settings: swissSettings
+
     };
 
     if (!formData.tournamentName) {
@@ -242,3 +274,19 @@ function showNotification(message, type) {
         alert(message);
     }
 }
+
+$(document).on(
+    'change',
+    '#createTournamentForm [name="tournamentType"], #swissMode',
+    function () {
+        const isSwiss =
+            $('#createTournamentForm [name="tournamentType"]').val()
+            === 'SwissSystem';
+
+        const isFixed = $('#swissMode').val() === 'FixedRounds';
+
+        $('#swissSettingsSection').toggle(isSwiss);
+        $('#swissRoundsBlock').toggle(isSwiss && isFixed);
+        $('.swiss-threshold').toggle(isSwiss && !isFixed);
+    }
+);

@@ -131,6 +131,31 @@ class TournamentsApi extends BaseApi {
     async registerPlayer(tournamentId) {
         return this.post(`${this.baseUrl}${this.endpoint}/${tournamentId}/register`, {});
     }
+    async generateOlympicFirstRound(tournamentId) {
+     return this.post(
+        `${this.baseUrl}${this.endpoint}/${tournamentId}/olympic/generate-first-round`
+     );
+    }
+
+    async generateOlympicNextRound(tournamentId) {
+     return this.post(
+        `${this.baseUrl}${this.endpoint}/${tournamentId}/olympic/generate-next-round`
+     );
+    }
+
+    async getStandings(tournamentId) {
+     return this.get(
+        `${this.baseUrl}${this.endpoint}/${tournamentId}/standings`
+     );
+    }
+
+async changeStatus(tournamentId, status) {
+    return this.patch(
+        `${this.baseUrl}${this.endpoint}/${tournamentId}/status`,
+        { status }
+    );
+}
+
 }
 
 window.tournamentsApi = new TournamentsApi();

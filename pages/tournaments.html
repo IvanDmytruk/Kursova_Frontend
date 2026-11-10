@@ -180,6 +180,55 @@
                             <input type="number" class="form-control" name="maxParticipants" value="0" min="0">
                         </div>
                     </div>
+
+<div class="row" id="swissSettingsSection" style="display: none;">
+    <div class="col-12 mb-3">
+        <h5>Налаштування Swiss</h5>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label for="swissMode" class="form-label">Режим Swiss</label>
+        <select id="swissMode" class="form-select">
+            <option value="WinLossThreshold">Пороги перемог і поразок</option>
+            <option value="FixedRounds">Фіксована кількість раундів</option>
+        </select>
+    </div>
+
+    <div class="col-md-6 mb-3" id="swissRoundsBlock" style="display: none;">
+        <label for="swissRoundsCount" class="form-label">Кількість раундів</label>
+        <input id="swissRoundsCount" type="number"
+               class="form-control" min="1" value="5">
+    </div>
+
+    <div class="col-md-6 mb-3 swiss-threshold">
+        <label for="swissWins" class="form-label">Перемог для проходження</label>
+        <input id="swissWins" type="number"
+               class="form-control" min="1" value="3">
+    </div>
+
+    <div class="col-md-6 mb-3 swiss-threshold">
+        <label for="swissLosses" class="form-label">Поразок для вибуття</label>
+        <input id="swissLosses" type="number"
+               class="form-control" min="1" value="3">
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-check-label">
+            <input id="swissRematches" type="checkbox"
+                   class="form-check-input me-2">
+            Дозволити повторні зустрічі
+        </label>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-check-label">
+            <input id="swissDraws" type="checkbox"
+                   class="form-check-input me-2">
+            Дозволити нічиї
+        </label>
+    </div>
+</div>
+
                 </form>
             </div>
             <div class="modal-footer">

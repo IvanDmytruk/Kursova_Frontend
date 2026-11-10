@@ -107,6 +107,7 @@
                     <i class="fas fa-plus-circle me-1"></i> Додати команду
                 </button>
             </div>
+            
             <div class="card-body">
                 <div id="participantsList" class="row">
                     <div class="col-12 text-center text-muted py-4">
@@ -117,6 +118,53 @@
             </div>
         </div>
     </div>
+
+<section class="card shadow-sm mt-4"
+         id="competitionSection"
+         style="display: none;">
+
+    <div class="card-header bg-dark text-white
+                d-flex justify-content-between
+                align-items-center flex-wrap gap-2">
+
+        <h5 class="mb-0">
+            <i class="fas fa-sitemap me-2"></i>
+            Матчі та раунди
+        </h5>
+
+        <button id="reloadCompetitionBtn"
+                class="btn btn-sm btn-outline-light"
+                type="button">
+            Оновити
+        </button>
+    </div>
+
+    <div class="card-body">
+        <div id="competitionInfo"
+             class="mb-3 text-muted"></div>
+
+        <!-- Тільки автор турніру або Admin -->
+        <div id="competitionOwnerPanel"
+             class="mb-3"
+             style="display: none;">
+
+            <div id="competitionActions"
+                 class="d-flex flex-wrap gap-2 mb-2"></div>
+
+            <div class="small text-muted">
+                Керування доступне автору турніру
+                або адміністратору.
+            </div>
+        </div>
+
+        <!-- Доступно всім -->
+        <div id="competitionMatches"></div>
+
+        <!-- Турнірна таблиця -->
+        <div id="competitionStandings" class="mt-4"></div>
+    </div>
+</section>
+
 </main>
 
 <!-- Модальне вікно редагування турніру -->
@@ -257,6 +305,8 @@
 <script src="/logic/api/teamsApi.js"></script>
 <script src="/logic/api/savedItemsApi.js"></script>
 <script src="/logic/pages/tournamentDetails.js"></script>
+<script src="/logic/pages/competition.js"></script>
+<script src="/logic/api/matchesApi.js"></script>
 
 </body>
 </html>
