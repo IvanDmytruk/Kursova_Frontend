@@ -1,117 +1,233 @@
-// logic/pages/matches.js
-$(document).ready(function() {
-    initializeMatchesPage();
+
+const matchesState = {
+    allMatches: [],
+    filteredMatches: [],
+    currentFilter: "today",
+    teamsMap: {},
+    loading: false
+};
+
+$(document).ready(function () {
     bindMatchesEvents();
     loadAllMatches();
 });
 
-let matchesState = {
-    allMatches: [],
-    filteredMatches: [],
-    currentFilter: 'upcoming',
-    teamsMap: {}
-};
-
-async function initializeMatchesPage() {
-    showMatchesLoadingState();
-}
-
 function bindMatchesEvents() {
-    $('.filter-btn').click(function() {
-        $('.filter-btn').removeClass('active');
-        $(this).addClass('active');
-        matchesState.currentFilter = $(this).data('filter');
+    $(document).on("click", ".filter-btn", function () {
+        matchesState.currentFilter = $(this).data("filter");
+
+        $(".filter-btn")
+            .removeClass("active btn-primary")
+            .addClass("btn-outline-primary");
+
+        $(this)
+            .addClass("active btn-primary")
+            .removeClass("btn-outline-primary");
+
         filterAndDisplayMatches();
     });
+
+    $(document).on("click", "#reloadMatchesBtn", function () {
+        loadAllMatches();
+    });
+
+    if (window.SearchBar && $("#search-container").length) {
+        new SearchBar("search-container");
+    }
+}
+
+function getMatchTime(match) {
+    const time = new Date(match.startTime).getTime();
+    return Number.isFinite(time) ? time : null;
+}
+
+function getTodayBounds() {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    return {
+        start: start.getTime(),
+        end: end.getTime()
+    };
+}
+
+function isFinishedMatch(match) {
+    const status = String(match.status ?? "").toLowerCase();
+
+    return [
+        "finished",
+        "completed",
+        "ended"
+    ].includes(status);
+}
+
+function normalizeMatches(response) {
+    if (Array.isArray(response)) {
+        return response;
+    }
+
+    if (Array.isArray(response?.items)) {
+        return response.items;
+    }
+
+    if (Array.isArray(response?.data)) {
+        return response.data;
+    }
+
+    throw new Error("Невідомий формат відповіді API матчів");
 }
 
 async function loadAllMatches() {
+    if (matchesState.loading) return;
+
+    matchesState.loading = true;
+
+    $("#reloadMatchesBtn").prop("disabled", true);
+    $("#matchesError").addClass("d-none").text("");
+
+    showMatchesLoadingState();
+
     try {
-        const matches = await window.matchesApi.getAll();
-        matchesState.allMatches = matches || [];
+        const response = await window.matchesApi.getAll();
+        matchesState.allMatches = normalizeMatches(response);
 
         await loadTeamsForMatches(matchesState.allMatches);
 
         filterAndDisplayMatches();
     } catch (error) {
-        console.error('Помилка завантаження матчів:', error);
-        $('#matchesList').html(`
-            <div class="col-12 text-center text-danger py-5">
-                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                <p>Не вдалося завантажити матчі</p>
-                <button class="btn btn-primary" onclick="loadAllMatches()">Спробувати знову</button>
-            </div>
-        `);
+        console.error("Помилка завантаження матчів:", error);
+
+        $("#matchesList").empty();
+
+        $("#matchesError")
+            .removeClass("d-none")
+            .text("Не вдалося завантажити матчі. Спробуйте оновити сторінку.");
+
+        $("#matchesCount").text("Помилка завантаження");
+    } finally {
+        matchesState.loading = false;
+        $("#reloadMatchesBtn").prop("disabled", false);
     }
 }
 
 async function loadTeamsForMatches(matches) {
     const teamIds = new Set();
+
     matches.forEach(match => {
-        if (match.homeTeamId) teamIds.add(match.homeTeamId);
-        if (match.awayTeamId) teamIds.add(match.awayTeamId);
+        if (match.homeTeamId) {
+            teamIds.add(match.homeTeamId);
+        }
+
+        if (match.awayTeamId) {
+            teamIds.add(match.awayTeamId);
+        }
     });
 
-    for (const teamId of teamIds) {
-        if (!matchesState.teamsMap[teamId]) {
-            try {
-                const team = await window.teamsApi.getById(teamId);
-                matchesState.teamsMap[teamId] = team;
-            } catch (error) {
-                console.error(`Помилка завантаження команди ${teamId}:`, error);
-                matchesState.teamsMap[teamId] = { teamName: 'Невідома команда' };
-            }
+    const missingIds = [...teamIds].filter(
+        id => !matchesState.teamsMap[id]
+    );
+
+    await Promise.all(missingIds.map(async teamId => {
+        try {
+            matchesState.teamsMap[teamId] =
+                await window.teamsApi.getById(teamId);
+        } catch (error) {
+            console.warn("Помилка команди:", teamId, error);
+
+            matchesState.teamsMap[teamId] = {
+                teamName: "Невідома команда"
+            };
         }
-    }
+    }));
 }
 
 function filterAndDisplayMatches() {
-    let filtered = [...matchesState.allMatches];
-    const now = new Date();
+    const { start, end } = getTodayBounds();
 
-    switch(matchesState.currentFilter) {
-        case 'upcoming':
-            filtered = filtered.filter(m => new Date(m.startTime) > now);
-            break;
-        case 'live':
-            filtered = filtered.filter(m => {
-                const start = new Date(m.startTime);
-                return start <= now && new Date(start.getTime() + 2*60*60*1000) >= now;
-            });
-            break;
-        case 'all':
-        default:
-            break;
-    }
+    let filtered = matchesState.allMatches.filter(match => {
+        const time = getMatchTime(match);
+
+        if (time === null) return false;
+
+        switch (matchesState.currentFilter) {
+            case "finished":
+                return time < start && isFinishedMatch(match);
+
+            case "today":
+                return time >= start && time < end;
+
+            case "upcoming":
+                return time >= end && !isFinishedMatch(match);
+
+            default:
+                return false;
+        }
+    });
+
+    filtered.sort((a, b) => {
+        const first = getMatchTime(a);
+        const second = getMatchTime(b);
+
+        if (matchesState.currentFilter === "finished") {
+            return second - first;
+        }
+
+        return first - second;
+    });
 
     matchesState.filteredMatches = filtered;
-    displayMatches(matchesState.filteredMatches);
+
+    displayMatches(filtered);
 }
 
 function displayMatches(matches) {
-    const container = $('#matchesList');
+    const container = $("#matchesList");
 
-    if (!matches || matches.length === 0) {
+    $("#matchesCount").text(`Знайдено матчів: ${matches.length}`);
+
+    if (!matches.length) {
         container.html(`
-            <div class="col-12 text-center text-muted py-5">
-                <i class="fas fa-calendar-day fa-3x mb-3"></i>
-                <p>Матчів не знайдено</p>
+            <div class="col-12 text-center py-5">
+                <i class="far fa-calendar-times fa-3x mb-3 text-muted"></i>
+                <h5>Матчів не знайдено</h5>
+                <p class="text-muted">
+                    У вибраній категорії немає матчів.
+                </p>
             </div>
         `);
         return;
     }
 
-    const matchesHtml = matches.map(match => {
-        const homeTeam = matchesState.teamsMap[match.homeTeamId];
-        const awayTeam = matchesState.teamsMap[match.awayTeamId];
-        return `<div class="col-md-6">${MatchCardComponent.create(match, homeTeam, awayTeam)}</div>`;
-    }).join('');
+    const html = matches.map(match => {
+        const homeTeam =
+            matchesState.teamsMap[match.homeTeamId];
 
-    container.html(matchesHtml);
+        const awayTeam =
+            matchesState.teamsMap[match.awayTeamId];
+
+        return `
+            <div class="col-12 col-xl-6">
+                ${MatchCardComponent.create(
+                    match,
+                    homeTeam,
+                    awayTeam
+                )}
+            </div>
+        `;
+    }).join("");
+
+    container.html(html);
 }
 
 function showMatchesLoadingState() {
-    $('#matchesList').html(MatchCardComponent.createSkeleton().repeat(6));
+    $("#matchesCount").text("Завантаження матчів...");
+
+    $("#matchesList").html(
+        MatchCardComponent.createSkeleton().repeat(6)
+    );
 }
 
 window.loadAllMatches = loadAllMatches;

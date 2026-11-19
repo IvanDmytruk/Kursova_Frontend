@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/style/main.css">
     <link rel="stylesheet" href="/style/components.css">
     <link rel="stylesheet" href="/style/responsive.css">
+    <link rel="stylesheet" href="/style/dashboard.css">
 </head>
 <body>
 
@@ -89,6 +90,23 @@
 <main class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-users me-2"></i>Команди</h2>
+
+<div class="row mb-4">
+    <div class="col-lg-5 col-md-7">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+
+            <input type="search"
+                   id="teamSearchInput"
+                   class="form-control"
+                   placeholder="Пошук за назвою команди..."
+                   aria-label="Пошук команд">
+        </div>
+    </div>
+</div>
+
         <button class="btn btn-primary" id="createTeamBtn" style="display: none;">
             <i class="fas fa-plus me-2"></i>Створити команду
         </button>
@@ -159,6 +177,7 @@
 <script src="/logic/utils/dateFormatter.js"></script>
 <script src="/logic/utils/notifications.js"></script>
 <script src="/logic/components/searchBar.js"></script>
+<script src="/logic/components/siteLayout.js"></script>
 <script src="/logic/pages/teams.js"></script>
 
 </body>

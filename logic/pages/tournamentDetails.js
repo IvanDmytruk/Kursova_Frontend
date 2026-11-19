@@ -1,5 +1,3 @@
-// logic/pages/tournamentDetails.js
-
 let currentTournament = null;
 let tournamentTeams = [];
 let allTeams = [];
@@ -11,7 +9,6 @@ $(document).ready(function() {
     loadTournamentDetails();
 });
 
-// Оновлення UI авторизації
 function updateAuthUI() {
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -32,50 +29,67 @@ function updateAuthUI() {
     $('#addTeamBtn').hide();
 }
 
-
-// Отримання ID турніру з URL
 function getTournamentId() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id');
 }
 
-// Завантаження деталей турніру
+
 async function loadTournamentDetails() {
     const tournamentId = getTournamentId();
+
     if (!tournamentId) {
-        showError('ID турніру не вказано');
-        window.location.href = '/pages/tournaments.html';
+        showError("ID турніру не вказано");
         return;
     }
 
     try {
-        const tournament = await window.tournamentsApi.getById(tournamentId);
+        const tournament =
+            await window.tournamentsApi.getById(tournamentId);
+
         if (!tournament) {
-            showError('Турнір не знайдено');
-            window.location.href = '/pages/tournaments.html';
+            showError("Турнір не знайдено");
             return;
         }
 
         currentTournament = tournament;
-        updateTournamentManagement();
-        displayTournamentInfo(tournament);
 
-        tournamentTeams = tournament.tournamentParticipants || [];
+        displayTournamentInfo(tournament);
+        updateTournamentManagement();
+
+        tournamentTeams =
+            tournament.tournamentParticipants || [];
+
         displayParticipants(tournamentTeams);
-        if (window.loadCompetition) {
-         window.loadCompetition(tournament);
+
+        $("#loadingSpinner").hide();
+        $("#tournamentContent").show();
+
+        if (
+            typeof window.loadTournamentParticipation === "function"
+        ) {
+            await window.loadTournamentParticipation();
         }
-        $('#loadingSpinner').hide();
-        $('#tournamentContent').show();
+
+        if (typeof window.loadCompetition === "function") {
+            window.loadCompetition(tournament);
+        }
 
     } catch (error) {
-        console.error('Помилка завантаження турніру:', error);
-        showError('Не вдалося завантажити дані турніру');
-        $('#loadingSpinner').hide();
+        console.error(
+            "Помилка завантаження турніру:",
+            error
+        );
+
+        showError(
+            error.message ||
+            "Не вдалося завантажити турнір"
+        );
+
+        $("#loadingSpinner").hide();
     }
 }
 
-// Відображення інформації про турнір
 function displayTournamentInfo(tournament) {
     $('#tournamentName').text(tournament.tournamentName || 'Без назви');
     $('#tournamentDescription').text(tournament.tournamentDescription || 'Опис відсутній');
@@ -93,87 +107,82 @@ function displayTournamentInfo(tournament) {
     statusBadge.addClass(status.class);
 }
 
-// Відображення списку учасників
+function displayParticipants(participants) {
+    const container = $("#participantsList");
 
-function displayParticipants(teams) {
-    const canEditParticipants = isUserAdmin() &&
-        ['Draft', 'Registration'].includes(currentTournament?.status);
+    if (!Array.isArray(participants) ||
+        !participants.length) {
 
-    if (!teams || teams.length === 0) {
-        $('#participantsList').html(`
+        container.html(`
             <div class="col-12 text-center text-muted py-4">
                 <i class="fas fa-users fa-2x mb-2"></i>
                 <p>Учасників поки немає</p>
-                ${canEditParticipants ? `
-                    <button class="btn btn-sm btn-primary mt-2"
-                            onclick="$('#addTeamBtn').click()">
-                        <i class="fas fa-plus"></i> Додати першу команду
-                    </button>
-                ` : ''}
+                <p class="small">
+                    Для участі потрібно подати заявку
+                    або прийняти запрошення.
+                </p>
             </div>
         `);
+
         return;
     }
 
-    let html = '';
+    container.empty();
 
-    teams.forEach(team => {
-        html += `
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="team-card" data-team-id="${escapeHtml(team.id)}">
-                    <div class="team-card-logo">
-                        <i class="fas fa-users"></i>
-                    </div>
+    participants.forEach(participant => {
+        const id = String(participant.id ?? "");
 
-                    <h6 class="team-card-name">
-                        ${escapeHtml(team.teamName || 'Без назви')}
-                    </h6>
+        const isIndividual =
+            currentTournament?.format === "Individual";
 
-                    <div class="team-card-stats">
-                        <small>
-                            Капітан:
-                            ${escapeHtml(team.captainName || 'Не вказано')}
-                        </small>
-                    </div>
+        const name = isIndividual
+            ? [
+                participant.name,
+                participant.surname
+            ].filter(Boolean).join(" ") || "Гравець"
+            : participant.teamName || "Команда";
 
-                    ${canEditParticipants ? `
-                        <button class="btn btn-sm btn-danger mt-2 remove-team-btn"
-                                data-team-id="${escapeHtml(team.id)}"
-                                data-team-name="${escapeHtml(team.teamName || 'Без назви')}">
-                            <i class="fas fa-trash"></i> Видалити
-                        </button>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-    });
+        const column = $("<div>")
+            .addClass("col-md-6 col-lg-4 mb-3");
 
-    $('#participantsList').html(html);
+        const card = $("<div>")
+            .addClass("card h-100 shadow-sm");
 
-    $('.remove-team-btn').on('click', function(e) {
-        e.stopPropagation();
+        const body = $("<div>")
+            .addClass("card-body");
 
-        const teamId = $(this).attr('data-team-id');
-        const teamName = $(this).attr('data-team-name');
+        $("<h6>")
+            .addClass("card-title")
+            .text(name)
+            .appendTo(body);
 
-        showDeleteConfirmation(teamId, teamName);
-    });
+        $("<span>")
+            .addClass("badge bg-success")
+            .text("Підтверджено")
+            .appendTo(body);
 
-    $('.team-card').on('click', function(e) {
-        if ($(e.target).closest('.remove-team-btn').length) {
-            return;
+        if (id) {
+            const url = isIndividual
+                ? `/pages/player-details.html?id=${
+                    encodeURIComponent(id)
+                }`
+                : `/pages/team-details.html?id=${
+                    encodeURIComponent(id)
+                }`;
+
+            $("<a>")
+                .addClass("btn btn-outline-primary btn-sm d-block mt-3")
+                .attr("href", url)
+                .text("Переглянути")
+                .appendTo(body);
         }
 
-        const teamId = $(this).attr('data-team-id');
-
-        if (teamId) {
-            window.location.href =
-                `/pages/team-details.html?id=${encodeURIComponent(teamId)}`;
-        }
+        card.append(body);
+        column.append(card);
+        container.append(column);
     });
 }
 
-// Завантаження всіх команд для додавання
 async function loadAllTeamsForAdding() {
     try {
         const allTeamsResponse = await window.teamsApi.getAll();
@@ -194,7 +203,8 @@ async function loadAllTeamsForAdding() {
         `);
     }
 }
-// Відображення доступних команд
+
+
 function displayAvailableTeams(teams) {
     if (!teams || teams.length === 0) {
         $('#teamsListContainer').html(`
@@ -235,7 +245,6 @@ function displayAvailableTeams(teams) {
     });
 }
 
-// Додавання команди до турніру
 async function addTeamToTournament(teamId, teamName) {
     const tournamentId = getTournamentId();
 
@@ -246,10 +255,8 @@ async function addTeamToTournament(teamId, teamName) {
             </div>
         `);
 
-        // Використовуємо оновлений метод addTeam
         await window.tournamentsApi.addTeam(tournamentId, teamId);
 
-        // Перезавантажуємо дані
         await loadTournamentDetails();
 
         showSuccess(`Команду "${teamName}" успішно додано до турніру!`);
@@ -263,7 +270,6 @@ async function addTeamToTournament(teamId, teamName) {
     }
 }
 
-// Видалення команди з турніру
 async function deleteTeamFromTournament() {
     if (!teamToDelete) return;
 
@@ -491,15 +497,16 @@ function isUserAdmin() {
 }
 
 function updateTournamentManagement() {
-    const canManage = isUserAdmin();
+    const canEdit =
+        isUserAdmin() &&
+        ["Draft", "Registration"].includes(
+            currentTournament?.status
+        );
 
-    const canEdit = canManage &&
-        ['Draft', 'Registration'].includes(currentTournament?.status);
+    $("#editTournamentBtn").toggle(canEdit);
 
-    $('#editTournamentBtn').toggle(canEdit);
-    $('#addTeamBtn').toggle(canEdit);
+    $("#addTeamBtn").hide();
 }
-
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -544,7 +551,6 @@ function showInfo(message) {
     setTimeout(() => alert.alert('close'), 3000);
 }
 
-// Пошук команд
 $(document).on('input', '#teamSearchInput', function() {
     const searchTerm = $(this).val().toLowerCase();
     const filteredTeams = allTeams.filter(team =>
@@ -553,20 +559,32 @@ $(document).on('input', '#teamSearchInput', function() {
     displayAvailableTeams(filteredTeams);
 });
 
-// Зв'язування подій
 function bindEvents() {
-    $('#saveTournamentBtn').click(saveTournament);
-    $('#editTournamentBtn').click(editTournament);
-    $('#registerForTournament').click(registerForTournament);
-    $('#addTeamBtn').click(async function() {
-        await loadAllTeamsForAdding();
-        $('#addTeamModal').modal('show');
-    });
-    $('#saveTournamentChangesBtn').click(saveTournamentChanges);
-    $('#confirmDeleteBtn').click(deleteTeamFromTournament);
-    $('#logoutBtn').click(async function(e) {
-        e.preventDefault();
-        localStorage.clear();
-        window.location.href = '/index.html';
+    $("#saveTournamentBtn").on(
+        "click",
+        saveTournament
+    );
+
+    $("#editTournamentBtn").on(
+        "click",
+        editTournament
+    );
+
+    $("#saveTournamentChangesBtn").on(
+        "click",
+        saveTournamentChanges
+    );
+
+    $("#registerForTournament").hide();
+    $("#addTeamBtn").hide();
+
+    $("#logoutBtn").on("click", function (event) {
+        event.preventDefault();
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+
+        window.location.href = "/index.html";
     });
 }

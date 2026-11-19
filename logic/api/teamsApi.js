@@ -1,61 +1,138 @@
-// logic/api/teamsApi.js
 class TeamsApi extends BaseApi {
     constructor() {
         super();
         this.endpoint = API_CONFIG.endpoints.teams;
     }
 
+    get url() {
+        return `${this.baseUrl}${this.endpoint}`;
+    }
+
+    id(value) {
+        return encodeURIComponent(value);
+    }
+
     async getAll() {
-        return this.get(`${this.baseUrl}${this.endpoint}`);
+        return this.get(this.url);
     }
 
     async getById(id) {
-        return this.get(`${this.baseUrl}${this.endpoint}/${id}`);
+        return this.get(`${this.url}/${this.id(id)}`);
     }
 
-    async searchByName(name) {
-        return this.get(`${this.baseUrl}${this.endpoint}/byname/${encodeURIComponent(name)}`);
+    async getPlayers(teamId) {
+        return this.get(`${this.url}/${this.id(teamId)}/players`);
     }
 
     async search(term) {
-        return this.get(`${this.baseUrl}${this.endpoint}/search?term=${encodeURIComponent(term)}`);
+        return this.get(
+            `${this.url}/search?term=${encodeURIComponent(term)}`
+        );
     }
 
-    async getPaged(page = 1, pageSize = 10) {
-        return this.get(`${this.baseUrl}${this.endpoint}/paged?page=${page}&pageSize=${pageSize}`);
+    async searchByName(name) {
+        return this.get(`${this.url}/byname/${this.id(name)}`);
     }
 
-    async create(teamData) {
-        return this.post(`${this.baseUrl}${this.endpoint}`, teamData);
+    async exists(name) {
+        return this.get(`${this.url}/exists/${this.id(name)}`);
     }
 
-    async update(id, teamData) {
-        return this.put(`${this.baseUrl}${this.endpoint}/${id}`, teamData);
+    async getPaged(page = 1, pageSize = 12) {
+        return this.get(
+            `${this.url}/paged?page=${page}&pageSize=${pageSize}`
+        );
+    }
+
+    async getBySport(sport) {
+        const teams = await this.getAll();
+
+        if (sport === "all") return teams;
+
+        return teams.filter(team =>
+            String(team.sportName).toLowerCase() ===
+            String(sport).toLowerCase()
+        );
+    }
+
+    async create(data) {
+        return this.post(this.url, data);
+    }
+
+    async update(id, data) {
+        return this.put(`${this.url}/${this.id(id)}`, data);
     }
 
     async delete(id) {
-        return this.delete(`${this.baseUrl}${this.endpoint}/${id}`);
-    }
-    // Отримати всіх гравців команди
-    async getPlayers(teamId) {
-        return this.get(`${this.baseUrl}${this.endpoint}/${teamId}/players`);
+        return super.delete(`${this.url}/${this.id(id)}`);
     }
 
-    // Отримати склад на матч
-    async getLineup(matchId, teamId) {
-        return this.get(`${this.baseUrl}${this.endpoint}/${teamId}/lineup/${matchId}`);
+    async getMyTeams() {
+        return this.get(`${this.url}/my`);
     }
 
-    // Встановити склад на матч (основні + запасні)
-    async setLineup(matchId, teamId, lineupData) {
-        return this.post(`${this.baseUrl}${this.endpoint}/${teamId}/lineup/${matchId}`, lineupData);
-    }
-    async getBySport(sport) {
-        return this.get(`${this.baseUrl}${this.endpoint}?sport=${sport}`);
+    async getMembers(teamId) {
+        return this.get(
+            `${this.url}/${this.id(teamId)}/members`
+        );
     }
 
-    async searchBySport(sport, searchTerm) {
-        return this.get(`${this.baseUrl}${this.endpoint}/search?sport=${sport}&q=${encodeURIComponent(searchTerm)}`);
+    async changeMemberRole(teamId, userId, role) {
+        return this.patch(
+            `${this.url}/${this.id(teamId)}/members/${this.id(userId)}`,
+            { role }
+        );
+    }
+
+    async removeMember(teamId, userId) {
+        return super.delete(
+            `${this.url}/${this.id(teamId)}/members/${this.id(userId)}`
+        );
+    }
+
+    async leaveTeam(teamId) {
+        return this.post(
+            `${this.url}/${this.id(teamId)}/leave`,
+            {}
+        );
+    }
+
+    async inviteMember(teamId, userId, role = "Player") {
+        return this.post(
+            `${this.url}/${this.id(teamId)}/invitations`,
+            { userId, role }
+        );
+    }
+
+    async getTeamInvitations(teamId) {
+        return this.get(
+            `${this.url}/${this.id(teamId)}/invitations`
+        );
+    }
+
+    async getMyInvitations() {
+        return this.get(`${this.url}/invitations/my`);
+    }
+
+    async acceptInvitation(invitationId) {
+        return this.patch(
+            `${this.url}/invitations/${this.id(invitationId)}/accept`,
+            {}
+        );
+    }
+
+    async rejectInvitation(invitationId) {
+        return this.patch(
+            `${this.url}/invitations/${this.id(invitationId)}/reject`,
+            {}
+        );
+    }
+
+    async cancelInvitation(invitationId) {
+        return this.patch(
+            `${this.url}/invitations/${this.id(invitationId)}/cancel`,
+            {}
+        );
     }
 }
 

@@ -1,4 +1,3 @@
-// logic/pages/teamDetails.js
 let currentTeam = null;
 let currentUser = null;
 
@@ -6,31 +5,57 @@ function getTeamId() {
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
 }
-
 async function loadTeamDetails() {
     const teamId = getTeamId();
+
     if (!teamId) {
-        document.getElementById('loadingSpinner').innerHTML = '<div class="alert alert-danger">ID команди не вказано</div>';
+        document.getElementById("loadingSpinner").innerHTML =
+            '<div class="alert alert-danger">ID команди не вказано</div>';
         return;
     }
 
     try {
         currentTeam = await window.teamsApi.getById(teamId);
+
         displayTeamInfo(currentTeam);
-        loadPlayers();
-        loadMatches();
-        loadStatistics();
-        loadTournaments();
-        checkIfSaved();
         checkEditPermissions();
 
-        document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('teamContent').style.display = 'block';
+        document.getElementById("loadingSpinner").style.display = "none";
+        document.getElementById("teamContent").style.display = "block";
+
+        await window.loadTeamMembers();
+
+        if (typeof window.updateInviteButton === "function") {
+            await window.updateInviteButton();
+        }
+
+        await Promise.allSettled([
+            loadMatches(),
+            loadStatistics(),
+            loadTournaments(),
+            checkIfSaved()
+        ]);
+
     } catch (error) {
-        console.error('Error loading team:', error);
-        document.getElementById('loadingSpinner').innerHTML = `<div class="alert alert-danger">Помилка завантаження: ${error.message}</div>`;
+        console.error(
+            "Помилка завантаження команди:",
+            error
+        );
+
+        const spinner = document.getElementById(
+            "loadingSpinner"
+        );
+
+        spinner.style.display = "block";
+        spinner.innerHTML = `
+            <div class="alert alert-danger">
+                Не вдалося завантажити команду.
+            </div>
+        `;
     }
 }
+
+
 
 function displayTeamInfo(team) {
     document.getElementById('teamName').textContent = team.teamName || 'Без назви';
@@ -39,17 +64,51 @@ function displayTeamInfo(team) {
     document.getElementById('teamPopularity').textContent = team.popularityScore || 0;
 }
 
-async function checkEditPermissions() {
-    const token = localStorage.getItem('accessToken');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    currentUser = user;
+function checkEditPermissions() {
+    const token = localStorage.getItem("accessToken");
 
-    const hasEditRights = token && (user.role === 'Admin');
+    let user = {};
 
-    if (hasEditRights) {
-        $('#editTeamBtnContainer').show();
-        $('#editTeamBtn').on('click', openEditModal);
+    try {
+        user = JSON.parse(
+            localStorage.getItem("user") || "{}"
+        );
+    } catch {
+        user = {};
     }
+
+    currentUser = user;
+    $("#saveProfileBtn, #deleteAccountBtn")
+    .prop("disabled", true)
+    .attr(
+        "title",
+        "Керування власним акаунтом поки недоступне"
+    );
+
+    const userId = String(user.id ?? "");
+    const ownerId = String(currentTeam?.ownerId ?? "");
+
+    const isOwner =
+        userId !== "" &&
+        ownerId !== "" &&
+        userId === ownerId;
+
+    const isAdmin =
+        String(user.role ?? "").toLowerCase() === "admin";
+
+    const canEdit = Boolean(
+        token && currentTeam && (isOwner || isAdmin)
+    );
+
+    $("#editTeamBtnContainer").toggle(canEdit);
+
+    $("#editTeamBtn")
+        .off("click.teamEdit")
+        .on("click.teamEdit", function () {
+            if (canEdit) {
+                openEditModal();
+            }
+        });
 }
 
 function openEditModal() {
@@ -80,42 +139,136 @@ async function saveTeamEdit() {
     }
 }
 
-async function loadPlayers() {
-    const container = $('#playersList');
-    try {
-        const players = await window.teamsApi.getPlayers(currentTeam.id);
 
-        if (!players || players.length === 0) {
-            container.html('<div class="col-12 text-center text-muted py-4"><i class="fas fa-user-slash fa-2x mb-2"></i><p>Гравців не додано</p></div>');
+async function loadPlayers() {
+    const container = $("#playersList");
+
+    if (!currentTeam?.id) {
+        container.html(
+            '<div class="col-12 text-muted">Команду не знайдено</div>'
+        );
+        return;
+    }
+
+    try {
+        const response = await window.teamsApi
+            .getPlayers(currentTeam.id);
+
+        const players = Array.isArray(response)
+            ? response
+            : [];
+
+        if (players.length === 0) {
+            container.html(`
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-user-slash fa-2x mb-2"></i>
+                    <p>У команді поки немає гравців</p>
+                </div>
+            `);
             return;
         }
 
-        let html = '<div class="row">';
-        for (const player of players) {
-            html += `
+        const escape = value =>
+            String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+
+        const roleNames = {
+            Captain: "Капітан",
+            Coach: "Тренер",
+            Player: "Гравець"
+        };
+
+        const html = players.map(player => {
+            const userId = String(player.userId ?? "");
+            const name = [
+                player.name,
+                player.surname
+            ].filter(Boolean).join(" ");
+
+            const role =
+                roleNames[player.role] ||
+                player.role ||
+                "Учасник";
+
+            const ownerLabel = player.isOwner
+                ? '<span class="badge bg-warning text-dark">Власник</span>'
+                : "";
+
+            const ageLabel =
+                Number.isFinite(player.age) &&
+                player.age > 0
+                    ? `${player.age} років`
+                    : "Вік не вказано";
+
+            return `
                 <div class="col-md-6 col-lg-4 mb-3">
-                    <div class="card player-card h-100" data-id="${player.id}" style="cursor: pointer;">
+                    <div class="card player-card h-100"
+                         data-user-id="${escape(userId)}"
+                         style="cursor:pointer">
                         <div class="card-body text-center">
-                            <div class="player-avatar rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px;">
+                            <div class="player-avatar rounded-circle
+                                        bg-primary d-flex align-items-center
+                                        justify-content-center mx-auto mb-3"
+                                 style="width:70px;height:70px">
                                 <i class="fas fa-user fa-2x text-white"></i>
                             </div>
-                            <h6 class="card-title">${escapeHtml(player.name || '')} ${escapeHtml(player.surname || '')}</h6>
-                            <p class="card-text small text-muted">${player.playerProfile?.jerseyNumber ? `#${player.playerProfile.jerseyNumber}` : 'Номер не вказано'}</p>
+
+                            <h6 class="card-title">
+                                ${escape(name || "Користувач")}
+                            </h6>
+
+                            <div class="d-flex gap-1 justify-content-center
+                                        flex-wrap mb-2">
+                                <span class="badge bg-secondary">
+                                    ${escape(role)}
+                                </span>
+                                ${ownerLabel}
+                            </div>
+
+                            <p class="card-text small text-muted mb-0">
+                                ${escape(ageLabel)}
+                            </p>
                         </div>
                     </div>
                 </div>
             `;
-        }
-        html += '</div>';
+        }).join("");
+
         container.html(html);
 
-        $('.player-card').on('click', function() {
-            const id = $(this).data('id');
-            window.location.href = `/pages/player-details.html?id=${id}`;
-        });
+        container
+            .off("click.teamPlayers", ".player-card")
+            .on(
+                "click.teamPlayers",
+                ".player-card",
+                function () {
+                    const userId = $(this)
+                        .attr("data-user-id");
+
+                    if (!userId) return;
+
+                    window.location.href =
+                        `/pages/player-details.html?id=${
+                            encodeURIComponent(userId)
+                        }`;
+                }
+            );
+
     } catch (error) {
-        console.error('Error loading players:', error);
-        container.html('<div class="col-12 text-center text-danger">Помилка завантаження гравців</div>');
+        console.error(
+            "Помилка завантаження складу:",
+            error
+        );
+
+        container.html(`
+            <div class="col-12 text-center text-danger py-4">
+                Не вдалося завантажити склад команди
+            </div>
+        `);
     }
 }
 

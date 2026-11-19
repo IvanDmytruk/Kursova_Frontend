@@ -55,15 +55,36 @@
 
 <main class="container my-4">
     <div class="row">
-        <!-- Бічна навігація профілю -->
         <div class="col-md-3 mb-4">
-            <div class="list-group">
+            <div class="list-group" id="profileNavigation">
                 <a href="#" class="list-group-item list-group-item-action active" data-tab="profile">
                     <i class="fas fa-user me-2"></i> Особисті дані
                 </a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="tournaments">
                     <i class="fas fa-trophy me-2"></i> Мої турніри
                 </a>
+                <a href="#"
+                 class="list-group-item list-group-item-action
+                 d-flex align-items-center justify-content-between"
+                 data-tab="invitations">
+                  <span>
+                    <i class="fas fa-envelope me-2"></i>Запрошення до команди
+                </span>
+                 <span id="invitationsCount"
+                  class="badge bg-danger rounded-pill"
+                   style="display:none">  0
+                  </span>
+                </a>
+            <a href="#"
+                class="list-group-item list-group-item-action"
+                data-tab="participation">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Турнірні заявки
+                <span id="participationCount"
+                class="badge bg-danger rounded-pill ms-2"
+                style="display:none">0</span>
+            </a>
+
                 <a href="#" class="list-group-item list-group-item-action" data-tab="stats">
                     <i class="fas fa-chart-line me-2"></i> Моя статистика
                 </a>
@@ -72,10 +93,7 @@
                 </a>
             </div>
         </div>
-
-        <!-- Контент профілю -->
         <div class="col-md-9">
-            <!-- Вкладка: Особисті дані -->
             <div id="tab-profile" class="tab-content active">
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white">
@@ -131,7 +149,6 @@
                 </div>
             </div>
 
-            <!-- Вкладка: Мої турніри -->
             <div id="tab-tournaments" class="tab-content" style="display: none;">
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white">
@@ -148,8 +165,48 @@
                     </div>
                 </div>
             </div>
+            
+<div id="tab-invitations"
+     class="tab-content"
+     style="display:none">
 
-            <!-- Вкладка: Моя статистика -->
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-dark text-white
+                    d-flex justify-content-between
+                    align-items-center">
+
+            <h5 class="mb-0">
+                <i class="fas fa-envelope-open-text me-2"></i>
+                Запрошення до команд
+            </h5>
+
+            <button type="button"
+                    id="refreshInvitationsBtn"
+                    class="btn btn-outline-light btn-sm">
+                <i class="fas fa-sync-alt me-1"></i>
+                Оновити
+            </button>
+        </div>
+
+        <div class="card-body">
+
+            <p class="text-muted small">
+                Тут відображаються запрошення від команд.
+                Після прийняття ви автоматично станете
+                учасником відповідної команди.
+            </p>
+
+            <div id="invitationsList">
+                <div class="text-center text-muted py-4">
+                    Завантаження запрошень...
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
             <div id="tab-stats" class="tab-content" style="display: none;">
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white">
@@ -194,7 +251,6 @@
                 </div>
             </div>
 
-            <!-- Вкладка: Налаштування -->
             <div id="tab-settings" class="tab-content" style="display: none;">
                 <div class="card shadow-sm">
                     <div class="card-header bg-dark text-white">
@@ -221,20 +277,55 @@
                     </div>
                 </div>
             </div>
+
+<div id="tab-participation"
+     class="tab-content"
+     style="display:none">
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white
+                    d-flex justify-content-between
+                    align-items-center gap-2">
+
+            <h5 class="mb-0">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Мої турнірні заявки
+            </h5>
+
+            <button type="button"
+                    id="refreshMyParticipation"
+                    class="btn btn-outline-light btn-sm">
+                <i class="fas fa-sync-alt me-1"></i>
+                Оновити
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div id="myParticipationRequests">
+                Завантаження...
+            </div>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 </main>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/logic/api/config.js"></script>
 <script src="/logic/api/authApi.js"></script>
 <script src="/logic/api/usersApi.js"></script>
+<script src="/logic/api/teamsApi.js"></script>
 <script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/api/statisticsApi.js"></script>
+
 <script src="/logic/utils/dateFormatter.js"></script>
 <script src="/logic/utils/notifications.js"></script>
+<script src="/logic/api/tournamentParticipationApi.js"></script>
+<script src="/logic/pages/tournamentParticipationInbox.js"></script>
+
+<script src="/logic/pages/teamInvitationInbox.js"></script>
 <script src="/logic/pages/profile.js"></script>
-<script src="/logic/api/statisticsApi.js"></script>
 
 </body>
 </html>

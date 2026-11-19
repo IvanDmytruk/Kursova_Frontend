@@ -165,6 +165,59 @@
     </div>
 </section>
 
+<section id="tournamentStaffSection"
+         class="card shadow-sm mt-4"
+         style="display:none;">
+
+    <div class="card-header d-flex align-items-center
+                justify-content-between flex-wrap gap-2">
+        <h5 class="mb-0">
+            <i class="fas fa-user-shield me-2"></i>
+            Менеджери турніру
+        </h5>
+
+        <button class="btn btn-sm btn-outline-primary"
+                id="reloadTournamentStaff"
+                type="button">
+            Оновити
+        </button>
+    </div>
+
+    <div class="card-body">
+        <p class="text-muted">
+            Призначай менеджерів і визначай, які дії
+            їм дозволено виконувати в цьому турнірі.
+        </p>
+
+        <form id="assignManagerForm" class="mb-4">
+            <label for="managerUserId" class="form-label">
+                ID користувача
+            </label>
+
+            <input type="text"
+                   id="managerUserId"
+                   class="form-control mb-3"
+                   placeholder="Введи ID користувача"
+                   required>
+
+            <div class="mb-3">
+                <strong>Права менеджера</strong>
+                <div id="managerPermissionFields"
+                     class="row g-2 mt-2"></div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    id="assignManagerBtn">
+                <i class="fas fa-user-plus me-2"></i>
+                Призначити менеджера
+            </button>
+        </form>
+
+        <h6>Призначені менеджери</h6>
+        <div id="tournamentManagersList"></div>
+    </div>
+</section>
 </main>
 
 <!-- Модальне вікно редагування турніру -->
@@ -188,12 +241,15 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Тип турніру</label>
-                            <select class="form-select" name="tournamentType" id="editTournamentType">
-                                <option value="OlympicSystem">Олімпійська система</option>
-                                <option value="RoundRobin">Коловий турнір</option>
-                                <option value="SwissSystem">Швейцарська система</option>
-                                <option value="DoubleElimination">Дві поразки</option>
+                            <select class="form-select"  name="tournamentType" id="editTournamentType">
+                                 <option value="OlympicSystem">Олімпійська система</option>
+                                 <option value="RoundRobin">Коловий турнір</option>
+                                 <option value="SwissSystem">Швейцарська система</option>
+                                 <option value="Cs2SwissSystem">Кіберспортивний Swiss</option>
+                                 <option value="GroupStage">Груповий етап</option>
+                                 <option value="DoubleElimination">Double Elimination</option>
                             </select>
+
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Формат</label>
@@ -300,14 +356,20 @@
     </div>
 </div>
 
+
 <script src="/logic/api/config.js"></script>
+<script src="/logic/api/tournamentManagementApi.js"></script>
 <script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/api/tournamentParticipationApi.js"></script>
 <script src="/logic/api/teamsApi.js"></script>
 <script src="/logic/api/matchesApi.js"></script>
 <script src="/logic/api/savedItemsApi.js"></script>
 
 <script src="/logic/pages/tournamentDetails.js"></script>
+<script src="/logic/pages/tournamentParticipation.js"></script>
 <script src="/logic/pages/competition.js"></script>
+<script src="/logic/pages/tournamentStaff.js"></script>
+
 
 
 </body>

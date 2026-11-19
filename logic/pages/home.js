@@ -479,7 +479,8 @@ if (!selectedSport) {
         $('#submitTournamentBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Створення...');
         await window.tournamentsApi.create(formData);
         alert('Турнір успішно створено!');
-        $('#createTournamentModal').modal('hide');
+        const modalElement = document.getElementById('createTournamentModal');
+bootstrap.Modal.getOrCreateInstance(modalElement).hide();
         form[0].reset();
         await loadActiveTournaments();
     } catch (error) {
@@ -543,9 +544,14 @@ function formatMatchTime(dateStr) {
 }
 
 function bindHomeEvents() {
-    $('#createTournamentBtn').click(() => {
-        $('#createTournamentModal').modal('show');
-    });
+    $('#createTournamentBtn').on('click', function () {
+    const modalElement = document.getElementById('createTournamentModal');
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+});
 
     $('#submitTournamentBtn').click(async () => {
         await createTournament();
