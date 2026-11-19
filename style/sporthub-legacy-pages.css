@@ -1,0 +1,477 @@
+
+/* ==============================================
+   SportHub — unified legacy page components
+   For profile, saved, teams and account tabs.
+   Colors are inherited from dashboard.css.
+   ============================================== */
+
+.sporthub-dashboard .sh-main-content {
+    color: var(--sh-text);
+    background: var(--sh-bg);
+    min-width: 0;
+}
+
+.sporthub-dashboard .sh-main-content h1,
+.sporthub-dashboard .sh-main-content h2,
+.sporthub-dashboard .sh-main-content h3,
+.sporthub-dashboard .sh-main-content h4,
+.sporthub-dashboard .sh-main-content h5,
+.sporthub-dashboard .sh-main-content h6 {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard .sh-main-content .text-muted,
+.sporthub-dashboard .sh-main-content .text-secondary,
+.sporthub-dashboard .sh-main-content .form-text {
+    color: var(--sh-muted) !important;
+}
+
+/* ----- Shared cards ----- */
+
+.sporthub-dashboard .sh-main-content .card {
+    background: var(--sh-panel);
+    border: 1px solid var(--sh-border);
+    border-radius: 16px;
+    color: var(--sh-text);
+    box-shadow: var(--sh-shadow, none);
+}
+
+.sporthub-dashboard .sh-main-content .card-body {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard .sh-main-content .card-title {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard .sh-main-content .card-text {
+    color: var(--sh-muted);
+}
+
+.sporthub-dashboard .sh-main-content .card-header {
+    background: var(--sh-panel-hover);
+    color: var(--sh-text);
+    border-bottom: 1px solid var(--sh-border);
+    padding: 17px 20px;
+    font-weight: 700;
+}
+
+.sporthub-dashboard .sh-main-content
+.card-header.bg-dark {
+    background: var(--sh-panel-hover) !important;
+    color: var(--sh-text) !important;
+}
+
+.sporthub-dashboard .sh-main-content
+.card-header.bg-dark h5,
+.sporthub-dashboard .sh-main-content
+.card-header.bg-dark .text-white {
+    color: var(--sh-text) !important;
+}
+
+.sporthub-dashboard .sh-main-content .card-footer {
+    background: var(--sh-panel);
+    border-top: 1px solid var(--sh-border);
+}
+
+/* Bootstrap light backgrounds must follow theme */
+
+.sporthub-dashboard .sh-main-content .bg-light,
+.sporthub-dashboard .sh-main-content .bg-white {
+    background: var(--sh-panel-hover) !important;
+    color: var(--sh-text) !important;
+}
+
+.sporthub-dashboard .sh-main-content .text-dark {
+    color: var(--sh-text) !important;
+}
+
+/* ----- Profile sidebar navigation ----- */
+
+.sporthub-dashboard #profileNavigation {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: var(--sh-panel);
+    border: 1px solid var(--sh-border);
+    border-radius: 16px;
+    box-shadow: var(--sh-shadow, none);
+}
+
+.sporthub-dashboard #profileNavigation .list-group-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 13px 15px;
+    background: transparent;
+    color: var(--sh-text);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: .92rem;
+    font-weight: 600;
+    transition:
+        background .18s ease,
+        color .18s ease,
+        border-color .18s ease;
+}
+
+.sporthub-dashboard #profileNavigation
+.list-group-item:hover {
+    color: var(--sh-primary);
+    background: var(--sh-panel-hover);
+}
+
+.sporthub-dashboard #profileNavigation
+.list-group-item.active {
+    color: var(--sh-primary);
+    background: var(--sh-panel-hover);
+    border-color: var(--sh-border);
+}
+
+.sporthub-dashboard #profileNavigation
+.list-group-item:focus-visible {
+    outline: 2px solid var(--sh-primary);
+    outline-offset: 2px;
+}
+
+/* ----- Profile statistics ----- */
+
+.sporthub-dashboard #tab-stats .card.bg-light {
+    background: var(--sh-panel-hover) !important;
+    border: 1px solid var(--sh-border);
+    box-shadow: none;
+}
+
+.sporthub-dashboard #tab-stats .card.bg-light h3 {
+    color: var(--sh-primary);
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.sporthub-dashboard #tab-stats .card.bg-light p {
+    color: var(--sh-muted) !important;
+}
+
+/* ----- Forms ----- */
+
+.sporthub-dashboard .sh-main-content .form-label {
+    color: var(--sh-text);
+    font-weight: 600;
+}
+
+.sporthub-dashboard .sh-main-content .form-control,
+.sporthub-dashboard .sh-main-content .form-select,
+.sporthub-dashboard .sh-main-content textarea {
+    background-color: var(--sh-panel);
+    border: 1px solid var(--sh-border);
+    border-radius: 10px;
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard .sh-main-content
+.form-control::placeholder {
+    color: var(--sh-muted);
+    opacity: 1;
+}
+
+.sporthub-dashboard .sh-main-content
+.form-control:focus,
+.sporthub-dashboard .sh-main-content
+.form-select:focus {
+    background-color: var(--sh-panel);
+    border-color: var(--sh-primary);
+    color: var(--sh-text);
+    box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--sh-primary) 16%, transparent);
+}
+
+.sporthub-dashboard .sh-main-content
+.form-control:disabled,
+.sporthub-dashboard .sh-main-content
+.form-control[readonly] {
+    background: var(--sh-panel-hover);
+    color: var(--sh-muted);
+    opacity: 1;
+}
+
+.sporthub-dashboard .sh-main-content
+.input-group-text {
+    background: var(--sh-panel-hover);
+    color: var(--sh-muted);
+    border-color: var(--sh-border);
+}
+
+/* ----- Saved tabs ----- */
+
+.sporthub-dashboard #savedTabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid var(--sh-border);
+    margin-bottom: 22px;
+}
+
+.sporthub-dashboard #savedTabs .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 2px solid transparent;
+    border-radius: 10px 10px 0 0;
+    padding: 12px 16px;
+    color: var(--sh-muted);
+    font-weight: 700;
+}
+
+.sporthub-dashboard #savedTabs .nav-link:hover {
+    color: var(--sh-primary);
+    background: var(--sh-panel-hover);
+}
+
+.sporthub-dashboard #savedTabs .nav-link.active {
+    color: var(--sh-primary);
+    background: var(--sh-panel);
+    border-color: var(--sh-border);
+    border-bottom-color: var(--sh-primary);
+}
+
+.sporthub-dashboard #savedTabs .badge {
+    background: var(--sh-panel-hover) !important;
+    color: var(--sh-text);
+    border: 1px solid var(--sh-border);
+}
+
+/* ----- Saved and team cards ----- */
+
+.sporthub-dashboard .sh-main-content
+.saved-card,
+.sporthub-dashboard .sh-main-content
+.team-card {
+    height: 100%;
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.sporthub-dashboard .sh-main-content
+.saved-card:hover,
+.sporthub-dashboard .sh-main-content
+.team-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--sh-primary);
+    box-shadow: var(--sh-shadow, none);
+}
+
+/* ----- Tables ----- */
+
+.sporthub-dashboard .sh-main-content .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--sh-text);
+    --bs-table-border-color: var(--sh-border);
+    --bs-table-hover-bg: var(--sh-panel-hover);
+    --bs-table-hover-color: var(--sh-text);
+
+    color: var(--sh-text);
+    border-color: var(--sh-border);
+}
+
+.sporthub-dashboard .sh-main-content
+.table > :not(caption) > * > * {
+    background-color: transparent;
+    color: var(--sh-text);
+    border-bottom-color: var(--sh-border);
+}
+
+/* ----- Additional Bootstrap elements ----- */
+
+.sporthub-dashboard .sh-main-content hr {
+    border-color: var(--sh-border);
+    opacity: 1;
+}
+
+.sporthub-dashboard .sh-main-content .alert {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard .sh-main-content .alert-info {
+    background: var(--sh-panel-hover);
+    border-color: var(--sh-border);
+}
+
+.sporthub-dashboard .sh-main-content
+.btn-outline-secondary {
+    color: var(--sh-text);
+    border-color: var(--sh-border);
+}
+
+.sporthub-dashboard .sh-main-content
+.btn-outline-secondary:hover {
+    background: var(--sh-panel-hover);
+    color: var(--sh-primary);
+    border-color: var(--sh-primary);
+}
+
+.sporthub-dashboard .sh-main-content .btn-primary {
+    background: var(--sh-primary);
+    border-color: var(--sh-primary);
+    color: #fff;
+}
+
+/* ----- Team creation modal ----- */
+
+.sporthub-dashboard #createTeamModal .modal-content {
+    background: var(--sh-panel);
+    color: var(--sh-text);
+    border: 1px solid var(--sh-border);
+    border-radius: 16px;
+}
+
+.sporthub-dashboard #createTeamModal .modal-header,
+.sporthub-dashboard #createTeamModal .modal-footer {
+    background: var(--sh-panel-hover) !important;
+    color: var(--sh-text) !important;
+    border-color: var(--sh-border);
+}
+
+.sporthub-dashboard #createTeamModal
+.modal-title {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard #createTeamModal
+.modal-header .btn-close {
+    filter: none;
+}
+
+html[data-theme="dark"]
+.sporthub-dashboard #createTeamModal
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* ----- Page headings ----- */
+
+.sporthub-dashboard .sh-legacy-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.sporthub-dashboard .sh-legacy-header h1 {
+    color: var(--sh-text);
+    margin: 0 0 7px;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.sporthub-dashboard .sh-legacy-header p {
+    color: var(--sh-muted);
+    margin: 0;
+}
+
+.sporthub-dashboard .sh-legacy-eyebrow {
+    color: var(--sh-primary);
+    font-weight: 800;
+    font-size: .74rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+/* ----- Responsive ----- */
+
+@media (max-width: 767px) {
+    .sporthub-dashboard .sh-main-content
+    .card-header {
+        padding: 14px 16px;
+    }
+
+    .sporthub-dashboard #profileNavigation {
+        margin-bottom: 16px;
+    }
+
+    .sporthub-dashboard #profileNavigation
+    .list-group-item {
+        padding: 11px 12px;
+    }
+
+    .sporthub-dashboard #savedTabs .nav-link {
+        padding: 10px 12px;
+        font-size: .86rem;
+    }
+
+    .sporthub-dashboard .sh-legacy-header {
+        align-items: stretch;
+    }
+}
+
+/* Saved and teams — final theme adjustments */
+
+.sporthub-dashboard .sh-main-content {
+    width: 100%;
+}
+
+.sporthub-dashboard .sh-collection-empty {
+    color: var(--sh-muted);
+    text-align: center;
+    padding: 36px 16px;
+}
+
+.sporthub-dashboard .sh-collection-empty i {
+    color: var(--sh-primary);
+}
+
+.sporthub-dashboard .sh-main-content .sh-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    background: var(--sh-panel-hover);
+    border: 1px solid var(--sh-border);
+    color: var(--sh-muted);
+    border-radius: 999px;
+    font-size: .8rem;
+}
+
+.sporthub-dashboard #createTeamModal .modal-body,
+.sporthub-dashboard #createTeamModal .modal-content {
+    background: var(--sh-panel);
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard #createTeamModal .form-label {
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard #createTeamModal .form-control,
+.sporthub-dashboard #createTeamModal .form-select {
+    background: var(--sh-panel);
+    border: 1px solid var(--sh-border);
+    color: var(--sh-text);
+}
+
+.sporthub-dashboard #createTeamModal
+.form-control:focus,
+.sporthub-dashboard #createTeamModal
+.form-select:focus {
+    border-color: var(--sh-primary);
+    box-shadow: none;
+}
+
+.sporthub-dashboard #createTeamModal .modal-header,
+.sporthub-dashboard #createTeamModal .modal-footer {
+    border-color: var(--sh-border);
+}
+
+@media (max-width: 767px) {
+    .sporthub-dashboard .sh-main-content {
+        padding: 18px 14px 36px;
+    }
+}

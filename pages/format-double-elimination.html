@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Подвійне вибування — SportHub</title>
+
+    <!-- Бібліотеки -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    >
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <!-- Стилі SportHub -->
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/dashboard.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+    <link rel="stylesheet" href="/style/sporthub-views.css">
+</head>
+
+<body>
+
+    <!-- Основний контент -->
+    <main class="sh-view" id="mainContent">
+
+        <!-- Заголовок сторінки -->
+        <header class="sh-view-header">
+
+            <div>
+                <div class="sh-eyebrow">
+                    SportHub · Турніри
+                </div>
+
+                <h1 id="viewTitle">
+                    Подвійне вибування
+                </h1>
+
+                <p id="viewSubtitle">
+                    Верхня й нижня сітки, фінальні стадії.
+                </p>
+            </div>
+
+            <!-- Кнопки керування -->
+            <div class="sh-view-actions">
+
+                <a
+                    class="btn btn-outline-primary"
+                    id="viewBack"
+                    href="/pages/tournaments.html"
+                >
+                    До турніру
+                </a>
+
+                <button
+                    class="btn btn-primary"
+                    id="viewReload"
+                    type="button"
+                >
+                    <i class="fas fa-rotate me-1"></i>
+                    Оновити
+                </button>
+
+            </div>
+        </header>
+
+        <!-- Повідомлення та помилки -->
+        <div id="viewAlert" hidden></div>
+
+        <!-- Основна сітка сторінки -->
+        <div class="sh-view-grid">
+
+            <!-- Центральна частина -->
+            <div id="viewBody">
+
+                <!-- Інформація про формат -->
+                <section class="sh-card">
+
+                    <h2>Принцип формату</h2>
+
+                    <p id="formatDescription">
+                        Верхня й нижня сітки, фінальні стадії.
+                    </p>
+
+                    <!-- Додаткова інформація про подвійне вибування -->
+                    <div id="formatSpecific"></div>
+
+                </section>
+
+                <!-- Турніри цього формату -->
+                <section class="sh-card">
+
+                    <h2>Турніри цього формату</h2>
+
+                    <div id="formatTournaments"></div>
+
+                </section>
+
+            </div>
+
+            <!-- Бічна панель -->
+            <aside id="viewSidebar"></aside>
+
+        </div>
+
+    </main>
+
+    <!-- API -->
+    <script src="/logic/api/config.js"></script>
+    <script src="/logic/api/authApi.js"></script>
+    <script src="/logic/api/teamsApi.js"></script>
+    <script src="/logic/api/tournamentsApi.js"></script>
+    <script src="/logic/api/matchesApi.js"></script>
+    <script src="/logic/api/tournamentManagementApi.js"></script>
+
+    <!-- Спільні компоненти -->
+    <script src="/logic/components/sporthubContext.js"></script>
+    <script src="/logic/components/siteLayout.js"></script>
+
+    <!-- Логіка сторінки -->
+    <script src="/logic/pages/tournamentFormatsView.js"></script>
+
+</body>
+</html>

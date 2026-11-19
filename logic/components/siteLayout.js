@@ -27,8 +27,10 @@
         ["/index.html", "fa-home", "Головна"],
         ["/pages/matches.html", "fa-calendar-alt", "Матчі"],
         ["/pages/tournaments.html", "fa-trophy", "Турніри"],
+        ["/pages/tournament-formats.html", "fa-sitemap", "Формати"],
         ["/pages/teams.html", "fa-users", "Команди"],
-        ["/pages/saved.html", "fa-bookmark", "Обране"]
+        ["/pages/saved.html", "fa-bookmark", "Обране"],
+        ["/pages/help.html", "fa-circle-question", "Допомога"]
     ];
 
     function readStorage(key, fallback = null) {
@@ -193,6 +195,16 @@
 
                 <div class="sh-nav-label">ОСНОВНЕ</div>
                 ${links}
+                ${window.location.pathname.includes("tournament-") && new URLSearchParams(window.location.search).get("id") ? (() => {
+                    const id = encodeURIComponent(new URLSearchParams(window.location.search).get("id"));
+                    return `
+                        <div class="sh-nav-divider"></div>
+                        <div class="sh-nav-label">ПОТОЧНИЙ ТУРНІР</div>
+                        <a class="sh-nav-link" href="/pages/tournament-overview.html?id=${id}"><i class="fas fa-gauge"></i><span>Огляд</span></a>
+                        <a class="sh-nav-link" href="/pages/tournament-standings.html?id=${id}"><i class="fas fa-table"></i><span>Таблиця</span></a>
+                        <a class="sh-nav-link" href="/pages/tournament-results.html?id=${id}"><i class="fas fa-list-check"></i><span>Результати</span></a>
+                        <a class="sh-nav-link" href="/pages/match-result-entry.html?id=${id}"><i class="fas fa-pen-to-square"></i><span>Внести результат</span></a>`;
+                })() : ""}
 
                 <div class="sh-nav-divider"></div>
                 <div class="sh-nav-label">КОРИСТУВАЧ</div>
@@ -201,6 +213,12 @@
                    class="sh-nav-link">
                     <i class="fas fa-user-circle"></i>
                     <span>Профіль</span>
+                </a>
+
+                <a href="/pages/profile.html?tab=participation"
+                   class="sh-nav-link">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Турнірні заявки</span>
                 </a>
 
                 <a href="/pages/profile.html?tab=stats"
@@ -487,7 +505,7 @@
             new window.SearchBar("search-container");
         }
     }
-
+    
     function setupLogout() {
         if (currentPage() === "/index.html") return;
 
@@ -545,4 +563,308 @@
         refreshAuth: updateAuth,
         setTheme: applyTheme
     };
+
+/* SportHub — Notification Center
+ * Uses existing #notificationsBtn from siteLayout.
+ */
+(() => {
+    "use strict";
+
+    let loading = false;
+
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function asList(value) {
+        return Array.isArray(value)
+            ? value
+            : Array.isArray(value?.items)
+                ? value.items
+                : [];
+    }
+
+    function isPending(item) {
+        return String(
+            item?.status ?? ""
+        ).toLowerCase() === "pending";
+    }
+
+    function ensurePanel() {
+        let panel = document.getElementById(
+            "shNotificationsPanel"
+        );
+
+        if (panel) return panel;
+
+        panel = document.createElement("section");
+
+        panel.id = "shNotificationsPanel";
+        panel.className = "sh-notifications-panel";
+        panel.hidden = true;
+
+        panel.setAttribute(
+            "aria-label",
+            "Центр сповіщень"
+        );
+
+        panel.innerHTML = `
+            <div class="sh-notifications-header">
+                <strong>Сповіщення</strong>
+
+                <button
+                    type="button"
+                    id="closeShNotifications"
+                    class="sh-notifications-close"
+                    aria-label="Закрити">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div
+                id="shNotificationsBody"
+                class="sh-notifications-body">
+                Завантаження...
+            </div>
+
+            <div class="sh-notifications-footer">
+                <a href="/pages/profile.html?tab=invitations">
+                    Команди
+                </a>
+
+                <a href="/pages/profile.html?tab=participation">
+                    Турніри
+                </a>
+            </div>
+        `;
+
+        document.body.appendChild(panel);
+
+        return panel;
+    }
+
+    function setCount(count) {
+        const badge = document.getElementById(
+            "notificationsCount"
+        );
+
+        if (!badge) return;
+
+        badge.textContent = count > 99
+            ? "99+"
+            : String(count);
+
+        badge.style.display =
+            count > 0 ? "inline-flex" : "none";
+    }
+
+    async function loadNotifications() {
+        if (loading) return;
+
+        const body = document.getElementById(
+            "shNotificationsBody"
+        );
+
+        if (!body) return;
+
+        const token = localStorage.getItem(
+            "accessToken"
+        );
+
+        if (!token) {
+            setCount(0);
+
+            body.innerHTML = `
+                <p>Увійдіть у свій акаунт,
+                   щоб переглядати сповіщення.</p>
+
+                <a class="btn btn-primary btn-sm"
+                   href="/pages/login.html">
+                    Увійти
+                </a>
+            `;
+
+            return;
+        }
+
+        if (typeof BaseApi === "undefined") {
+            body.textContent =
+                "Сервіс повідомлень недоступний.";
+            return;
+        }
+
+        loading = true;
+
+        body.textContent = "Завантаження...";
+
+        try {
+            const api = new BaseApi();
+            const base = API_CONFIG.baseUrl;
+
+            const responses = await Promise.allSettled([
+                api.get(
+                    `${base}/api/Teams/invitations/my`
+                ),
+                api.get(
+                    `${base}/api/Tournaments/requests/my`
+                )
+            ]);
+
+            const teamInvitations =
+                responses[0].status === "fulfilled"
+                    ? asList(responses[0].value)
+                        .filter(isPending)
+                    : [];
+
+            const tournamentInvitations =
+                responses[1].status === "fulfilled"
+                    ? asList(responses[1].value).filter(
+                        item =>
+                            isPending(item) &&
+                            String(item.type).toLowerCase()
+                                === "invitation"
+                    )
+                    : [];
+
+            const count =
+                teamInvitations.length +
+                tournamentInvitations.length;
+
+            setCount(count);
+
+            if (responses.every(
+                response => response.status === "rejected"
+            )) {
+                body.textContent =
+                    "Не вдалося завантажити сповіщення.";
+                return;
+            }
+
+            if (count === 0) {
+                body.innerHTML = `
+                    <div class="sh-notification-empty">
+                        <i class="far fa-bell"></i>
+                        <p>Нових запрошень немає</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const teamItems = teamInvitations.map(item => `
+                <a
+                    class="sh-notification-item"
+                    href="/pages/profile.html?tab=invitations">
+
+                    <i class="fas fa-users"></i>
+
+                    <span>
+                        <strong>Запрошення до команди</strong>
+                        <small>
+                            Роль:
+                            ${escapeHtml(item.role || "Учасник")}
+                        </small>
+                    </span>
+                </a>
+            `);
+
+            const tournamentItems =
+                tournamentInvitations.map(item => `
+                    <a
+                        class="sh-notification-item"
+                        href="/pages/profile.html?tab=participation">
+
+                        <i class="fas fa-trophy"></i>
+
+                        <span>
+                            <strong>Запрошення на турнір</strong>
+                            <small>
+                                Перейдіть до профілю,
+                                щоб відповісти
+                            </small>
+                        </span>
+                    </a>
+                `);
+
+            body.innerHTML = [
+                ...teamItems,
+                ...tournamentItems
+            ].join("");
+
+        } catch (error) {
+            console.error(
+                "Помилка центра сповіщень:",
+                error
+            );
+
+            body.textContent =
+                "Не вдалося отримати сповіщення.";
+
+        } finally {
+            loading = false;
+        }
+    }
+
+    function initialize() {
+        const button = document.getElementById(
+            "notificationsBtn"
+        );
+
+        if (!button) return;
+
+        const panel = ensurePanel();
+
+        setCount(0);
+
+        button.addEventListener("click", event => {
+            event.stopPropagation();
+
+            panel.hidden = !panel.hidden;
+
+            if (!panel.hidden) {
+                loadNotifications();
+            }
+        });
+
+        document.getElementById(
+            "closeShNotifications"
+        ).addEventListener("click", () => {
+            panel.hidden = true;
+        });
+
+        document.addEventListener("click", event => {
+            if (
+                !panel.hidden &&
+                !panel.contains(event.target) &&
+                !button.contains(event.target)
+            ) {
+                panel.hidden = true;
+            }
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                panel.hidden = true;
+            }
+        });
+
+        if (localStorage.getItem("accessToken")) {
+            loadNotifications();
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialize
+        );
+    } else {
+        initialize();
+    }
+})();
+
 })();

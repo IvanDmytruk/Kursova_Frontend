@@ -1,0 +1,39 @@
+
+"use strict";
+
+class TournamentScheduleApi extends BaseApi {
+    constructor() {
+        super();
+        this.endpoint = "/api/TournamentSchedule";
+    }
+
+    get url() {
+        return `${this.baseUrl}${this.endpoint}`;
+    }
+
+    async setMatchTime(matchId, data) {
+        if (!matchId) {
+            throw new Error("Не вказано ID матчу.");
+        }
+
+        return this.patch(
+            `${this.url}/matches/${encodeURIComponent(matchId)}`,
+            data
+        );
+    }
+
+    async generateSchedule(tournamentId, data) {
+        if (!tournamentId) {
+            throw new Error("Не вказано ID турніру.");
+        }
+
+        return this.post(
+            `${this.url}/tournaments/${
+                encodeURIComponent(tournamentId)
+            }/generate`,
+            data
+        );
+    }
+}
+
+window.tournamentScheduleApi = new TournamentScheduleApi();

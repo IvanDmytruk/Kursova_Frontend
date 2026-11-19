@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Внесення результату — SportHub</title>
+
+    <!-- Бібліотеки -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    >
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <!-- Стилі SportHub -->
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/dashboard.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+    <link rel="stylesheet" href="/style/sporthub-views.css">
+</head>
+
+<body>
+
+    <!-- Основний контент -->
+    <main class="sh-view" id="mainContent">
+
+        <!-- Заголовок сторінки -->
+        <header class="sh-view-header">
+
+            <div>
+                <div class="sh-eyebrow">
+                    SportHub · Турніри
+                </div>
+
+                <h1 id="viewTitle">
+                    Внесення результату
+                </h1>
+
+                <p id="viewSubtitle">
+                    Звичайні та технічні результати з перевіркою прав
+                </p>
+            </div>
+
+            <!-- Кнопки керування -->
+            <div class="sh-view-actions">
+
+                <a
+                    class="btn btn-outline-primary"
+                    id="viewBack"
+                    href="/pages/tournaments.html"
+                >
+                    До турніру
+                </a>
+
+                <button
+                    class="btn btn-primary"
+                    id="viewReload"
+                    type="button"
+                >
+                    <i class="fas fa-rotate me-1"></i>
+                    Оновити
+                </button>
+
+            </div>
+        </header>
+
+        <!-- Повідомлення та помилки -->
+        <div id="viewAlert" hidden></div>
+
+        <!-- Основна сітка сторінки -->
+        <div class="sh-view-grid">
+
+            <!-- Центральна частина -->
+            <div id="viewBody">
+
+                <!-- Внесення звичайного результату -->
+                <section class="sh-card">
+
+                    <h2 id="entryMatchName">
+                        Оберіть матч
+                    </h2>
+
+                    <!-- Вибір матчу -->
+                    <label
+                        class="form-label"
+                        for="entryMatch"
+                    >
+                        Матч
+                    </label>
+
+                    <select
+                        class="form-select mb-3"
+                        id="entryMatch"
+                    >
+                        <option value="">
+                            Завантаження...
+                        </option>
+                    </select>
+
+                    <!-- Форма результату -->
+                    <form id="resultForm">
+
+                        <div class="sh-form-grid">
+
+                            <!-- Рахунок першого учасника -->
+                            <div>
+                                <label
+                                    class="form-label"
+                                    for="entryHome"
+                                >
+                                    Рахунок першого учасника
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    id="entryHome"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Рахунок другого учасника -->
+                            <div>
+                                <label
+                                    class="form-label"
+                                    for="entryAway"
+                                >
+                                    Рахунок другого учасника
+                                </label>
+
+                                <input
+                                    class="form-control"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    id="entryAway"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+
+                        <!-- Дії з результатом -->
+                        <div
+                            id="entryActions"
+                            class="mt-3"
+                        ></div>
+
+                    </form>
+
+                </section>
+
+                <!-- Внесення технічного результату -->
+                <section class="sh-card">
+
+                    <h2>Технічний результат</h2>
+
+                    <p class="sh-muted">
+                        Доступно лише користувачам із дозволом SetTechnicalResults.
+                    </p>
+
+                    <!-- Форма технічного результату -->
+                    <form id="technicalForm">
+
+                        <!-- Тип технічного результату -->
+                        <label
+                            class="form-label"
+                            for="technicalType"
+                        >
+                            Тип
+                        </label>
+
+                        <select
+                            class="form-select mb-3"
+                            id="technicalType"
+                        >
+                            <option value="TechnicalWin">
+                                Технічна перемога
+                            </option>
+
+                            <option value="Forfeit">
+                                Технічна поразка / неявка
+                            </option>
+
+                            <option value="Disqualification">
+                                Дискваліфікація
+                            </option>
+                        </select>
+
+                        <!-- Вибір переможця -->
+                        <label
+                            class="form-label"
+                            for="technicalWinner"
+                        >
+                            Переможець
+                        </label>
+
+                        <select
+                            class="form-select mb-3"
+                            id="technicalWinner"
+                            required
+                        ></select>
+
+                        <!-- Причина технічного результату -->
+                        <label
+                            class="form-label"
+                            for="technicalReason"
+                        >
+                            Причина (мінімум 5 символів)
+                        </label>
+
+                        <textarea
+                            class="form-control mb-3"
+                            id="technicalReason"
+                            minlength="5"
+                            required
+                            rows="3"
+                        ></textarea>
+
+                        <!-- Збереження технічного результату -->
+                        <button
+                            class="btn btn-outline-danger"
+                            id="saveTechnical"
+                            type="submit"
+                        >
+                            Встановити технічний результат
+                        </button>
+
+                    </form>
+
+                </section>
+
+            </div>
+
+            <!-- Бічна панель -->
+            <aside id="viewSidebar"></aside>
+
+        </div>
+
+    </main>
+
+    <!-- API -->
+    <script src="/logic/api/config.js"></script>
+    <script src="/logic/api/authApi.js"></script>
+    <script src="/logic/api/teamsApi.js"></script>
+    <script src="/logic/api/tournamentsApi.js"></script>
+    <script src="/logic/api/matchesApi.js"></script>
+    <script src="/logic/api/tournamentManagementApi.js"></script>
+
+    <!-- Спільні компоненти -->
+    <script src="/logic/components/sporthubContext.js"></script>
+    <script src="/logic/components/siteLayout.js"></script>
+
+    <!-- Логіка сторінки -->
+    <script src="/logic/pages/matchResultEntryView.js"></script>
+
+</body>
+</html>

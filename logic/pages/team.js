@@ -1,284 +1,416 @@
-(function () {
-    "use strict";
+"use strict";
+let currentSport =
+    localStorage.getItem("selectedSport") || "all";
 
-    let currentSport =
-        localStorage.getItem("selectedSport") || "all";
+let allTeams = [];
 
-    let allTeams = [];
-    let searchTerm = "";
+$(document).ready(function () {
+    updateAuthUI();
+    bindEvents();
+    bindSportChanges();
+    loadTeams();
+});
 
-    const $list = () => $("#teamsList");
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+function updateAuthUI() {
+    const token = localStorage.getItem("accessToken");
+
+    let user = {};
+
+    try {
+        user = JSON.parse(
+            localStorage.getItem("user") || "{}"
+        );
+    } catch {
+        user = {};
     }
 
-    function isAuthenticated() {
-        return Boolean(localStorage.getItem("accessToken"));
-    }
+    const loggedIn = Boolean(
+        token && (user.id || user.email)
+    );
 
-    function normalizeTeams(response) {
-        if (Array.isArray(response)) return response;
-        if (Array.isArray(response?.items)) return response.items;
-        return [];
-    }
+    $("#createTeamBtn").toggle(loggedIn);
+}
 
-    function showMessage(message, type = "secondary") {
-        $list().html(`
-            <div class="col-12">
-                <div class="text-center p-5">
-                    <div class="text-${type}">
-                        ${escapeHtml(message)}
-                    </div>
-                </div>
+function bindSportChanges() {
+    window.addEventListener(
+        "sporthub:sport-changed",
+        async event => {
+            currentSport =
+                event.detail?.sport || "all";
+
+            await loadTeams();
+        }
+    );
+
+    window.addEventListener("storage", event => {
+        if (event.key !== "selectedSport") return;
+
+        currentSport = event.newValue || "all";
+        loadTeams();
+    });
+}
+
+async function loadTeams() {
+    const container = $("#teamsList");
+
+    container.html(`
+        <div class="col-12 text-center text-muted py-5">
+            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+            <p>Завантаження команд...</p>
+        </div>
+    `);
+
+    try {
+        const response = currentSport === "all"
+            ? await window.teamsApi.getAll()
+            : await window.teamsApi.getBySport(currentSport);
+
+        allTeams = Array.isArray(response)
+            ? response
+            : Array.isArray(response?.items)
+                ? response.items
+                : [];
+
+        filterAndDisplayTeams();
+
+    } catch (error) {
+        console.error(
+            "Error loading teams:",
+            error
+        );
+
+        container.html(`
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-exclamation-triangle
+                          fa-2x text-danger mb-3"></i>
+                <p>Не вдалося завантажити команди.</p>
+                <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="retryTeamsBtn">
+                    Повторити
+                </button>
             </div>
         `);
+
+        $("#retryTeamsBtn").on("click", loadTeams);
+    }
+}
+
+function filterAndDisplayTeams() {
+    const search = String(
+        $("#teamSearchInput").val() || ""
+    ).trim().toLowerCase();
+
+    const filtered = allTeams.filter(team => {
+        const name = String(
+            team.teamName || ""
+        ).toLowerCase();
+
+        return name.includes(search);
+    });
+
+    displayTeams(filtered);
+}
+
+function displayTeams(teams) {
+    const container = $("#teamsList");
+
+    if (!teams.length) {
+        container.html(`
+            <div class="col-12 text-center text-muted py-5">
+                <i class="fas fa-users fa-2x mb-3"></i>
+                <p>Команд не знайдено</p>
+            </div>
+        `);
+        return;
     }
 
-    function updateCreateButton() {
-        $("#createTeamBtn").toggle(isAuthenticated());
-    }
-
-    function getFilteredTeams() {
-        return allTeams.filter(team => {
-            const sportMatches =
-                currentSport === "all" ||
-                String(team.sportName).toLowerCase() ===
-                currentSport.toLowerCase();
-
-            const text = [
-                team.teamName,
-                team.teamDescription,
-                team.sportName
-            ].join(" ").toLowerCase();
-
-            return sportMatches && text.includes(searchTerm);
-        });
-    }
-
-    function renderTeams() {
-        const teams = getFilteredTeams();
-
-        if (!teams.length) {
-            showMessage("Команд за обраними умовами не знайдено");
-            return;
-        }
-
-        const html = teams.map(team => `
+    container.html(
+        teams.map(team => `
             <div class="col-md-6 col-xl-4">
-                <article class="card team-card h-100"
-                         data-team-id="${escapeHtml(team.id)}">
+                <article
+                    class="card team-card h-100"
+                    data-id="${escapeHtml(team.id)}"
+                    tabindex="0"
+                    role="link"
+                    aria-label="Переглянути команду ${escapeHtml(team.teamName)}">
 
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="team-avatar">
-                                <i class="fas fa-users"></i>
-                            </div>
+                    <div class="card-body text-center">
 
-                            <div class="flex-grow-1">
-                                <h5 class="card-title mb-1">
-                                    ${escapeHtml(team.teamName)}
-                                </h5>
+                        <div class="team-logo rounded-circle
+                                    d-flex align-items-center
+                                    justify-content-center
+                                    mx-auto mb-3"
+                             style="width:76px;height:76px">
 
-                                <small class="text-muted">
-                                    ${escapeHtml(team.sportName)}
-                                </small>
-                            </div>
+                            <i class="fas fa-users fa-2x text-white"></i>
                         </div>
 
-                        <p class="card-text text-muted">
+                        <div class="d-flex justify-content-between
+                                    align-items-start gap-2 mb-2">
+
+                            <h2 class="h5 card-title mb-0">
+                                ${escapeHtml(
+                                    team.teamName || "Без назви"
+                                )}
+                            </h2>
+
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-warning
+                                       save-team-btn"
+                                data-id="${escapeHtml(team.id)}"
+                                aria-label="Додати або видалити з обраного">
+
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+
+                        <p class="card-text small text-muted">
                             ${escapeHtml(
-                                team.teamDescription ||
-                                "Опис команди відсутній"
+                                String(team.teamDescription || "")
+                                    .substring(0, 110)
                             )}
                         </p>
 
                         <div class="d-flex justify-content-between
                                     align-items-center mt-3">
-                            <span class="small text-muted">
-                                Спортивна команда
+
+                            <span class="badge bg-secondary">
+                                ${escapeHtml(
+                                    team.sportName || "Спорт"
+                                )}
                             </span>
 
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="/pages/team-details.html?id=${encodeURIComponent(team.id)}">
-                                Детальніше
-                                <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
+                            <small class="text-warning">
+                                <i class="fas fa-star me-1"></i>
+                                ${escapeHtml(
+                                    team.popularityScore || 0
+                                )}
+                            </small>
                         </div>
                     </div>
                 </article>
             </div>
-        `).join("");
+        `).join("")
+    );
+}
 
-        $list().html(html);
-    }
+function bindEvents() {
+    $("#teamSearchInput").on(
+        "input",
+        filterAndDisplayTeams
+    );
 
-    async function loadTeams() {
-        showMessage("Завантаження команд...");
-
-        try {
-            const response = await window.teamsApi.getAll();
-
-            allTeams = normalizeTeams(response);
-
-            allTeams.sort((a, b) =>
-                String(a.teamName).localeCompare(
-                    String(b.teamName), "uk"
-                )
-            );
-
-            renderTeams();
-        } catch (error) {
-            console.error("Помилка завантаження команд:", error);
-
-            showMessage(
-                "Не вдалося завантажити команди. " +
-                "Перевірте підключення до Backend.",
-                "danger"
-            );
-        }
-    }
-
-    function openCreateModal() {
-        if (!isAuthenticated()) {
-            window.location.href = "/pages/login.html";
-            return;
-        }
-
-        const element =
+    $("#createTeamBtn").on("click", function () {
+        const modalElement =
             document.getElementById("createTeamModal");
 
-        bootstrap.Modal
-            .getOrCreateInstance(element)
-            .show();
-    }
-
-    async function createTeam() {
-        if (!isAuthenticated()) {
-            window.location.href = "/pages/login.html";
-            return;
-        }
-
-        const form = document.getElementById("createTeamForm");
-
-        if (!form.reportValidity()) return;
-
-        const formData = new FormData(form);
-
-        const data = {
-            teamName: String(
-                formData.get("teamName") || ""
-            ).trim(),
-
-            teamDescription: String(
-                formData.get("teamDescription") || ""
-            ).trim(),
-
-            sportName: String(
-                formData.get("sportName") || ""
-            )
-        };
-
-        if (data.teamName.length < 3) {
-            alert("Назва команди має містити мінімум 3 символи");
-            return;
-        }
-
-        const button = $("#submitTeamBtn");
-        button.prop("disabled", true).text("Створення...");
-
-        try {
-            const nameCheck =
-                await window.teamsApi.exists(data.teamName);
-
-            if (nameCheck?.exists === true) {
-                alert("Команда з такою назвою вже існує");
-                return;
-            }
-
-            const created = await window.teamsApi.create(data);
-
-            bootstrap.Modal
-                .getOrCreateInstance(
-                    document.getElementById("createTeamModal")
-                )
-                .hide();
-
-            form.reset();
-
-            if (created?.id) {
-                window.location.href =
-                    `/pages/team-details.html?id=` +
-                    encodeURIComponent(created.id);
-                return;
-            }
-
-            await loadTeams();
-
-        } catch (error) {
-            console.error("Помилка створення команди:", error);
-
-            alert(
-                "Не вдалося створити команду: " +
-                (error.message || "Невідома помилка")
-            );
-        } finally {
-            button.prop("disabled", false).text("Створити");
-        }
-    }
-
-    function bindEvents() {
-        $("#createTeamBtn").on("click", openCreateModal);
-
-        $("#submitTeamBtn").on("click", createTeam);
-
-        $("#teamSearchInput").on("input", function () {
-            searchTerm = this.value.trim().toLowerCase();
-            renderTeams();
-        });
-
-        window.addEventListener(
-            "sporthub:sport-changed",
-            event => {
-                currentSport = event.detail.sport;
-                renderTeams();
-            }
-        );
-
-        if (!window.SportHubLayout) {
-            $(document).on(
-                "click",
-                "#sportDropdownMenu [data-sport]",
-                function (event) {
-                    event.preventDefault();
-
-                    currentSport = this.dataset.sport;
-
-                    localStorage.setItem(
-                        "selectedSport",
-                        currentSport
-                    );
-
-                    $("#selectedSportName").text(
-                        $(this).text().trim()
-                    );
-
-                    renderTeams();
-                }
-            );
-        }
-    }
-
-    $(function () {
-        updateCreateButton();
-        bindEvents();
-        loadTeams();
+        bootstrap.Modal.getOrCreateInstance(
+            modalElement
+        ).show();
     });
 
-    window.reloadTeams = loadTeams;
-})();
+    $("#submitTeamBtn").on(
+        "click",
+        createTeam
+    );
+
+    $("#teamsList").on(
+        "click",
+        ".team-card",
+        function (event) {
+            if ($(event.target).closest(
+                ".save-team-btn"
+            ).length) {
+                return;
+            }
+
+            const id = $(this).attr("data-id");
+
+            if (id) {
+                window.location.href =
+                    `/pages/team-details.html?id=${
+                        encodeURIComponent(id)
+                    }`;
+            }
+        }
+    );
+
+    $("#teamsList").on(
+        "keydown",
+        ".team-card",
+        function (event) {
+            if (
+                event.target !== this ||
+                !["Enter", " "].includes(event.key)
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const id = $(this).attr("data-id");
+
+            if (id) {
+                window.location.href =
+                    `/pages/team-details.html?id=${
+                        encodeURIComponent(id)
+                    }`;
+            }
+        }
+    );
+
+    $("#teamsList").on(
+        "click",
+        ".save-team-btn",
+        async function (event) {
+            event.stopPropagation();
+
+            const id = $(this).attr("data-id");
+
+            if (!id) return;
+
+            await toggleSaveTeam(id, $(this));
+        }
+    );
+}
+
+async function toggleSaveTeam(id, button) {
+    if (!localStorage.getItem("accessToken")) {
+        showNotification(
+            "Увійдіть, щоб зберігати команди",
+            "warning"
+        );
+        window.location.href = "/pages/login.html";
+        return;
+    }
+
+    button.prop("disabled", true);
+
+    try {
+        const saved =
+            await window.savedItemsApi.getUserSavedItems();
+
+        const isSaved = (
+            saved?.savedTeams || []
+        ).some(item =>
+            String(typeof item === "object" ? item.id : item)
+            === String(id)
+        );
+
+        if (isSaved) {
+            await window.savedItemsApi.removeSavedTeam(id);
+
+            button.html(
+                '<i class="far fa-bookmark"></i>'
+            );
+
+            showNotification(
+                "Команду видалено з обраного",
+                "info"
+            );
+        } else {
+            await window.savedItemsApi.saveTeam(id);
+
+            button.html(
+                '<i class="fas fa-bookmark"></i>'
+            );
+
+            showNotification(
+                "Команду додано до обраного",
+                "success"
+            );
+        }
+
+    } catch (error) {
+        console.error(error);
+
+        showNotification(
+            "Не вдалося оновити обране",
+            "error"
+        );
+
+    } finally {
+        button.prop("disabled", false);
+    }
+}
+
+async function createTeam() {
+    const form = $("#createTeamForm");
+
+    const teamName = String(
+        form.find('[name="teamName"]').val() || ""
+    ).trim();
+
+    const teamDescription = String(
+        form.find('[name="teamDescription"]').val() || ""
+    ).trim();
+
+    const sportName =
+        $("#teamSportSelect").val();
+
+    if (!teamName) {
+        showNotification(
+            "Введіть назву команди",
+            "warning"
+        );
+        return;
+    }
+
+    const data = {
+        teamName,
+        teamDescription,
+        sportName
+    };
+
+    const button = $("#submitTeamBtn");
+
+    button.prop("disabled", true).html(`
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        Створення...
+    `);
+
+    try {
+        await window.teamsApi.create(data);
+
+        const modalElement =
+            document.getElementById("createTeamModal");
+
+        bootstrap.Modal.getOrCreateInstance(
+            modalElement
+        ).hide();
+
+        form[0].reset();
+
+        showNotification(
+            "Команду успішно створено",
+            "success"
+        );
+
+        await loadTeams();
+
+    } catch (error) {
+        console.error(error);
+
+        showNotification(
+            "Не вдалося створити команду: " +
+            error.message,
+            "error"
+        );
+
+    } finally {
+        button.prop("disabled", false)
+            .html("Створити");
+    }
+}

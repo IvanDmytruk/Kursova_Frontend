@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Календар матчів — SportHub</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/style/main.css">
+    <link rel="stylesheet" href="/style/components.css">
+    <link rel="stylesheet" href="/style/dashboard.css">
+    <link rel="stylesheet" href="/style/responsive.css">
+    <link rel="stylesheet" href="/style/sporthub-views.css">
+</head>
+
+<body>
+<main class="sh-view" id="mainContent">
+
+    <header class="sh-view-header">
+        <div>
+            <div class="sh-eyebrow">
+                SportHub · Управління турніром
+            </div>
+
+            <h1 id="viewTitle">Календар матчів</h1>
+
+            <p id="viewSubtitle">
+                Дати, перенесення та автоматичне планування матчів
+            </p>
+        </div>
+
+        <div class="sh-view-actions">
+            <a
+                id="viewBack"
+                class="btn btn-outline-primary"
+                href="/pages/tournaments.html">
+                До турніру
+            </a>
+
+            <button
+                id="viewReload"
+                class="btn btn-primary"
+                type="button">
+                <i class="fas fa-rotate me-1"></i>
+                Оновити
+            </button>
+        </div>
+    </header>
+
+    <div id="viewAlert" hidden></div>
+
+    <div class="sh-view-grid">
+        <div id="viewBody">
+
+            <section class="sh-card mb-4">
+                <h2 class="h5 fw-bold mb-3">
+                    Заплановані матчі
+                </h2>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-5">
+                        <label
+                            for="scheduleSearch"
+                            class="form-label">
+                            Пошук матчу
+                        </label>
+
+                        <input
+                            id="scheduleSearch"
+                            class="form-control"
+                            type="search"
+                            placeholder="Назва або команда">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label
+                            for="scheduleFilter"
+                            class="form-label">
+                            Фільтр
+                        </label>
+
+                        <select
+                            id="scheduleFilter"
+                            class="form-select">
+                            <option value="all">Усі матчі</option>
+                            <option value="scheduled">Із датою</option>
+                            <option value="unscheduled">Без дати</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="scheduleMatches">
+                    <p class="text-muted">Завантаження...</p>
+                </div>
+            </section>
+
+            <section
+                id="scheduleManagement"
+                class="sh-card mb-4"
+                hidden>
+
+                <h2 class="h5 fw-bold mb-3">
+                    <i class="fas fa-calendar-plus me-2"></i>
+                    Призначити або змінити час
+                </h2>
+
+                <form id="setMatchTimeForm">
+
+                    <div class="mb-3">
+                        <label
+                            for="scheduleMatchId"
+                            class="form-label">
+                            Матч
+                        </label>
+
+                        <select
+                            id="scheduleMatchId"
+                            class="form-select"
+                            required>
+                        </select>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label
+                                for="scheduleStartTime"
+                                class="form-label">
+                                Дата та час
+                            </label>
+
+                            <input
+                                id="scheduleStartTime"
+                                type="datetime-local"
+                                class="form-control"
+                                required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label
+                                for="scheduleDuration"
+                                class="form-label">
+                                Тривалість, хв
+                            </label>
+
+                            <input
+                                id="scheduleDuration"
+                                type="number"
+                                min="15"
+                                max="1440"
+                                step="1"
+                                value="120"
+                                class="form-control"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label
+                            for="scheduleReason"
+                            class="form-label">
+                            Причина зміни
+                        </label>
+
+                        <textarea
+                            id="scheduleReason"
+                            class="form-control"
+                            maxlength="500"
+                            rows="2"
+                            placeholder="Наприклад: перенесення за рішенням організатора"></textarea>
+                    </div>
+
+                    <div class="mt-3">
+                        <button
+                            id="saveScheduleBtn"
+                            type="submit"
+                            class="btn btn-primary">
+                            Зберегти дату
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section
+                id="automaticScheduleSection"
+                class="sh-card mb-4"
+                hidden>
+
+                <h2 class="h5 fw-bold mb-2">
+                    Автоматичний календар
+                </h2>
+
+                <p class="text-muted mb-3">
+                    Система послідовно розподілить матчі
+                    за датами й часом.
+                </p>
+
+                <form id="automaticScheduleForm">
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label
+                                for="autoFirstStart"
+                                class="form-label">
+                                Початкова дата та час
+                            </label>
+
+                            <input
+                                id="autoFirstStart"
+                                type="datetime-local"
+                                class="form-control"
+                                required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label
+                                for="autoDuration"
+                                class="form-label">
+                                Тривалість, хв
+                            </label>
+
+                            <input
+                                id="autoDuration"
+                                type="number"
+                                min="15"
+                                max="1440"
+                                step="1"
+                                value="120"
+                                class="form-control"
+                                required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label
+                                for="autoBreak"
+                                class="form-label">
+                                Перерва, хв
+                            </label>
+
+                            <input
+                                id="autoBreak"
+                                type="number"
+                                min="0"
+                                max="1440"
+                                step="1"
+                                value="30"
+                                class="form-control"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-check mt-3">
+                        <input
+                            id="autoOverwrite"
+                            class="form-check-input"
+                            type="checkbox">
+
+                        <label
+                            class="form-check-label"
+                            for="autoOverwrite">
+                            Перепланувати матчі, які вже мають дату
+                        </label>
+                    </div>
+
+                    <p class="small text-muted mt-3">
+                        Увага: перепланування може створити
+                        повідомлення всім учасникам і підписникам.
+                        Для раундів, учасники яких ще не визначені,
+                        дати поки не призначаються.
+                    </p>
+
+                    <button
+                        id="generateScheduleBtn"
+                        class="btn btn-primary"
+                        type="submit">
+                        <i class="fas fa-calendar-days me-2"></i>
+                        Сформувати календар
+                    </button>
+                </form>
+            </section>
+        </div>
+
+        <aside id="viewSidebar"></aside>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="/logic/api/config.js"></script>
+<script src="/logic/api/authApi.js"></script>
+<script src="/logic/api/teamsApi.js"></script>
+<script src="/logic/api/tournamentsApi.js"></script>
+<script src="/logic/api/matchesApi.js"></script>
+<script src="/logic/api/tournamentManagementApi.js"></script>
+<script src="/logic/api/tournamentScheduleApi.js"></script>
+
+<script src="/logic/components/sporthubContext.js"></script>
+<script src="/logic/components/siteLayout.js"></script>
+
+<script src="/logic/pages/tournamentScheduleView.js"></script>
+</body>
+</html>
